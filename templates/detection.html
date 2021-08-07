@@ -1,0 +1,25 @@
+{% extends 'base.html'%}
+
+{% block title %}
+{{title}}
+{% endblock%}
+
+
+{% block cap%}
+{{cap}}
+{% endblock%}
+
+{% block content%}
+<form action="/upload1File" method="post" enctype="multipart/form-data">
+
+    <input type="file" name="fileMRi">
+
+    <input type="submit" value="Upload">
+
+</form>
+
+{% if dosya %}
+<br>
+<img width="250px" src="{{ url_for('static', filename='uploadFolder/'+ fileMRi) }}" />
+{% endif %}
+{% endblock%}
