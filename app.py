@@ -1,6 +1,29 @@
-import os
-from flask import Flask, render_template, url_for, request, redirect, abort, flash
+# Importing flask module in the project is mandatory
+# An object of Flask class is our WSGI application.
+from flask import Flask, redirect, url_for, request, render_template, Response, jsonify, redirect
 from werkzeug.utils import secure_filename
+from gevent.pywsgi import WSGIServer
+import numpy as np
+import pandas as pd
+from flask import jsonify
+from flask import render_template
+import tensorflow as tf
+from tensorflow import keras
+from keras.models import load_model
+from keras.preprocessing import image
+from util import base64_to_pil, pil2datauri
+
+import os
+import sys
+
+from PIL import Image
+import io
+from mrcnn import utils
+from mrcnn import visualize
+from mrcnn.visualize import display_images
+import mrcnn.model as modellib
+from mrcnn.model import log
+
 app = Flask(__name__, template_folder='templates')
 app.config['UPLOAD_FOLDER'] = 'static/uploadFolder'
 app.secret_key = "msy"
@@ -20,9 +43,15 @@ def index():
 
 @app.route('/msDetection')
 def msDetection():
-
     title = "MS Detection"
     cap = "MS Detection - Test"
+    return render_template('detection.html', title=title, cap=cap)
+
+@app.route('/msDetection/<fname>')
+def detecFile():
+    title = "MS Detection"
+    cap = "MS Detection - Test"
+
     return render_template('detection.html', title=title, cap=cap)
 
 
