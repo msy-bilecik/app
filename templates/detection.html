@@ -1,25 +1,38 @@
 {% extends 'base.html'%}
 
 {% block title %}
-{{title}}
-{% endblock%}
+{{ title }}
+{% endblock %}
 
 
-{% block cap%}
-{{cap}}
-{% endblock%}
+{% block cap %}
+{{ cap }}
+{% endblock %}
 
 {% block content%}
+
+{% with messages= get_flashed_messages()%}
+{% if messages%}
+<ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
 <form action="{{url_for('upload1File')}}" method="post" enctype="multipart/form-data">
 
-    <input type="file" name="fileMRi">
+    <input type="file" name="fname">
 
     <input type="submit" value="Upload">
 
 </form>
 
-{% if dosya %}
-<br>
-<img width="250px" src="{{ url_for('static', filename='uploadFolder/'+ fileMRi) }}" />
+{% if filename %}
+<div style="padding: 20px;">
+    <img width="500px" src="{{url_for('detecFile',filename=filename)}}" />
+</div>
 {% endif %}
-{% endblock%}
+
+{% endblock %}
