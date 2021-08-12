@@ -15,7 +15,7 @@
 <main id="main" class="container">
     <section id="followup" class="followup">
         {% if abstract %}
-        <p class="py-3">Yapılan incelemeler sonucunda; {{abstract}}</p>
+        <p class="py-3">{{abstract}}</p>
         {%endif%}
         {% with messages= get_flashed_messages(with_categories=true)%}
         {% if messages%}
