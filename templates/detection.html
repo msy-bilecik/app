@@ -21,23 +21,17 @@
 </form>
 {% with messages= get_flashed_messages()%}
 {% if messages%}
-<ul>
     {% for message in messages %}
-    <li>{{ message }}</li>
+    <p>{{ message }}</p>
     {% endfor %}
-</ul>
 {% endif %}
 {% endwith %}
 
 {% if filename %}
 <div style="padding: 20px;">
-    <img width="500px" src="{{url_for('detecFile',filename=filename)}}" />
+    <img width="800px" src="{{url_for('detecFile',filename=filename)}}" />
 </div>
 {% endif %}
 
-
-{% if result %}
-{{ result }}
-{% endif %}
 
 {% endblock %}

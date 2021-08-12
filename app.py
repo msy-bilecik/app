@@ -23,6 +23,7 @@ import sys
 import io
 import cv2
 
+import matplotlib.pyplot as plt
 from PIL import Image
 import tensorflow as tf
 print(tf.__version__)
@@ -74,28 +75,9 @@ print('Loading Weights')
 print('Model loaded. Start serving...')
 
 
-def model_predict(img, model):
-    # img = img.resize((224, 224))
-
-    # Preprocessing the image
-    x = image.img_to_array(img)
-    # x = np.true_divide(x, 255)
-    # x = np.expand_dims(x, axis=0)
-    # If has an alpha channel, remove it for consistency
-    if x.shape[-1] == 4:
-        x = x[..., :3]
-
-    # Be careful how your trained model deals with the input
-    # otherwise, it won't make correct prediction!
-
-    preds = model.detect([x], verbose=1)
-    r = preds[0]
-
-    return r['rois']
-
-
 app = Flask(__name__, template_folder='templates')
 app.config['UPLOAD_FOLDER'] = 'static/uploadFolder'
+UPLOAD_PRED_PATH = app.config['UPLOAD_FOLDER']
 app.config['MAX_CONTENT_LENGTH'] = 16*1024*1024
 app.secret_key = "msy"
 
@@ -123,9 +105,6 @@ def msDetection():
 
 @app.route('/msDetection/<filename>')
 def detecFile(filename):
-    #title = "MS Detection"
-    #cap = "MS Detection - Test"
-    # return render_template('detection.html', title=title, cap=cap+" "+fname, filename=fname)
     return redirect(url_for('static', filename='uploadFolder/'+filename), code=301)
 
 
@@ -145,53 +124,34 @@ def upload1File():
 
             # gelen dosyayı güvenlik önlemlerinden geçir
         if f and uzanti_kontrol(f.filename):
+
             filename = secure_filename(f.filename)
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            f.save(filepath)
             flash('Dosya başarıyla yüklendi.')
+            image = cv2.imread(filepath)
+            results = model.detect([image], verbose=1)
+
+            class_names = ['BG', 'msMask']
+            r = results[0]
+            predFileName = "pre_"+filename.split('.')[0]+".jpg"
+            print(predFileName)
+            pred_path = UPLOAD_PRED_PATH+"/"+predFileName
+            visualize.save_instances(
+                image, r['rois'], r['masks'], r['class_ids'], class_names,  r['scores'], path=pred_path)
+            flash("Tespit edilen lezyon adedi: "+str(len(r['class_ids'])))
+            flash("Lezyon Tespit Başarımı: " +
+                  str(sum(r['scores'])/len(r['class_ids'])))
+            
             title = "MS Detection"
             cap = "MS Detection - Test"
-            result=segmentFile(filename)
-            return render_template('detection.html', title=title, cap=cap+" "+filename, filename=filename,result=result)
+            return render_template('detection.html', title=title, cap=cap+" PRE "+filename, filename=predFileName)
+
         else:
             flash('İzin verilmeyen dosya uzantısı')
             return redirect('msDetection')
     else:
         abort(401)
-
-def segmentFile(filename):
-    message=""
-    #img = Image.open(io.BytesIO(img.read()))
-    #img = Image.open(io.BytesIO(img))
-    # img = base64_to_pil(request.json)
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    img = cv2.imread(filepath)
-    preds = model_predict(img, model)
-    if preds.size > 0:
-        message="sss"
-        for pred in preds:
-            responsejson= {
-                    'x1': int(pred[0][0]),
-                    'x2': int(pred[0][1]),
-                    'y1': int(pred[0][2]),
-                    'y2': int(pred[0][3]),
-                }
-                #json_resp = jsonify(responsejson)
-                #json_resp.status_code = 200
-                #print(json_resp)
-        message=responsejson
-    else:
-        message="zzz"
-        json_resp = {
-                    'x1': 'None',
-                    'x2': 'None',
-                    'y1': 'None',
-                    'y2': 'None',
-                }
-                #json_resp = jsonify(json_resp)
-                #json_resp.status_code = 200
-                #print(json_resp)
-        message = json_resp
-    return message
 
 
 @app.route('/followup')
