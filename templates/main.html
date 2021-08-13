@@ -7,6 +7,10 @@
 
 {% block cap%}
 {{cap}}
+
+{% if text %}
+<p class="m-3 font-italic text-white text-center">{{text}}</p>
+{% endif %}
 {% endblock%}
 
 {% block content%}

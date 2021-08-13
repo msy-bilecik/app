@@ -1,0 +1,37 @@
+{% extends 'base.html'%}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+
+{% block cap %}
+{{ cap }}
+{% endblock %}
+
+{% block content%}
+
+
+<form action="{{url_for('upload1File')}}" method="post" enctype="multipart/form-data">
+
+    <input type="file" name="fileBefore">
+    <input type="file" name="fileAfter">
+    <input type="submit" value="Upload">
+
+</form>
+{% with messages= get_flashed_messages()%}
+{% if messages%}
+{% for message in messages %}
+<p>{{ message }}</p>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+{% if filename %}
+<div style="padding: 20px;">
+    <img width="800px" src="{{url_for('detecFile',filename=filename)}}" />
+</div>
+{% endif %}
+
+
+{% endblock %}

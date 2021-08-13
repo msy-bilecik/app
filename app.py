@@ -93,7 +93,8 @@ def uzanti_kontrol(dosyaadi):
 def index():
     title = "Homepage"
     cap = "Homepage - Test"
-    return render_template('main.html', title=title, cap=cap)
+    content ="Multiple Sclerosis Detection And Follow-up System Test Page"
+    return render_template('main.html', title=title, cap=cap,text=content)
 
 
 @app.route('/msDetection')
