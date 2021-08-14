@@ -1,4 +1,4 @@
 
 *.h5
 /static/uploadFolder
-*__pycache__*
+*pycache*
