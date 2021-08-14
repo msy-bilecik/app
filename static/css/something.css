@@ -5,11 +5,11 @@
 * ==========================================
 *
 */
-#upload {
+#upload,#upload2 {
     opacity: 0;
 }
 
-#upload-label {
+#upload-label, #upload2-label {
     position: absolute;
     top: 50%;
     left: 1rem;

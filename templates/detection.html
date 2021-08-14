@@ -28,19 +28,19 @@
 
 </form>
 <!-- Uploaded image area-->
-<p class="font-italic text-white text-center">The image uploaded will be rendered inside the box below.</p>
+<p class="font-italic text-white text-center">MR Image </p>
 <div class="image-area mt-4"><img id="imageResult" src="#" alt="" class="img-fluid rounded shadow-sm mx-auto d-block">
 </div>
 
 </div>
 </div>
 
-{% with messages= get_flashed_messages()%}
-    {% if messages%}
-        {% for message in messages %}
-        <p class="font-italic text-white text-center">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
+{% with messages= get_flashed_messages(with_categories=true)%}
+{% if messages%}
+{% for category,message in messages %}
+<div class="alert alert-{{category}}" role="alert">{{ message }}</div>
+{% endfor %}
+{% endif %}
 {% endwith %}
 
     {% if filename %}

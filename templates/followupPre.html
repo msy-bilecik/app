@@ -1,0 +1,44 @@
+{% extends 'base.html'%}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+
+{% block cap %}
+{{ cap }}
+{% endblock %}
+
+{% block content%}
+
+<div class="row py-4">
+    <div class="col-md-6 mx-auto">
+        <!-- Uploaded image area-->
+        <p class="font-italic text-white text-center mt-4">First MR image.</p>
+        <div class="image-area mt-2"><img id="detectedFile" src="{{url_for('detecFile',filename=filename1)}}" alt=""
+                class="img-fluid rounded shadow-sm mx-auto d-block">
+        </div>
+    </div>
+    <div class="col-md-6 mx-auto">
+        <p class="font-italic text-white text-center mt-4">Second MR image </p>
+        <div class="image-area mt-2"><img id="detectedFile" src="{{url_for('detecFile',filename=filename2)}}" alt=""
+                class="img-fluid rounded shadow-sm mx-auto d-block">
+        </div>
+    </div>
+</div>
+
+
+{% with messages= get_flashed_messages(with_categories=true)%}
+{% if messages%}
+{% for category,message in messages %}
+<div class="alert alert-{{category}}" role="alert">{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+
+<div class="input-group-append">
+    <a href="{{url_for('followup')}}"> <input class="btn btn-secondary m-2 rounded-pill px-4 w-100"
+            value="New Follow-Up"></a>
+</div>
+{% endblock %}

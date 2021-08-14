@@ -17,6 +17,8 @@ from werkzeug.utils import secure_filename
 from gevent.pywsgi import WSGIServer
 import numpy as np
 import pandas as pd
+from skimage.metrics import structural_similarity as ssim
+
 
 import os
 import sys
@@ -88,13 +90,51 @@ def uzanti_kontrol(dosyaadi):
     return '.' in dosyaadi and \
         dosyaadi.rsplit('.', 1)[1].lower() in FILETYPES
 
+def maskCompound(mArr):
+    col=mArr.shape
+    s=col[2]
+    if s>1:
+        mArr1=mArr[:,:,0]
+        i=1
+        while i<s:
+            mArr2=mArr[:,:,i]
+            mArr1=np.logical_or(mArr1,mArr2)
+            i=i+1
+        m=mArr1
+        m2 = m[:, :, np.newaxis]
+        
+        return m2
+    else:
+        return mArr
+
+
+def mse(imageA, imageB):
+	# the 'Mean Squared Error' between the two images is the
+	# sum of the squared difference between the two images;
+	# NOTE: the two images must have the same dimension
+	err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
+	err /= float(imageA.shape[0] * imageA.shape[1])
+
+	# return the MSE, the lower the error, the more "similar"
+	# the two images are
+	return err
+
+def compareMasks(masks1, masks2):
+    # print(masks1.shape)
+    # print(masks2.shape)
+    # print(maskCompound(masks1).shape)
+    # print(maskCompound(masks2).shape)
+    message = mse(maskCompound(masks1),
+                   maskCompound(masks2))
+    return message
+
 
 @app.route('/')
 def index():
     title = "Homepage"
     cap = "Homepage - Test"
-    content ="Multiple Sclerosis Detection And Follow-up System Test Page"
-    return render_template('main.html', title=title, cap=cap,text=content)
+    content = "Multiple Sclerosis Detection And Follow-up System Test Page"
+    return render_template('main.html', title=title, cap=cap, content=content)
 
 
 @app.route('/msDetection')
@@ -114,13 +154,13 @@ def upload1File():
     if request.method == 'POST':
         # formdan dosya gelip gelmediğini kontrol edelim
         if 'fname' not in request.files:
-            flash('Dosya seçilmedi')
+            flash('Dosya seçilmedi', 'danger')
             return redirect('msDetection')
 
             # kullanıcı dosya seçmemiş ve tarayıcı boş isim göndermiş mi
         f = request.files['fname']
         if f.filename == '':
-            flash('Dosya seçilmedi')
+            flash('Dosya seçilmedi', 'danger')
             return redirect('msDetection')
 
             # gelen dosyayı güvenlik önlemlerinden geçir
@@ -129,7 +169,7 @@ def upload1File():
             filename = secure_filename(f.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             f.save(filepath)
-            flash('Dosya başarıyla yüklendi.')
+            flash('Dosya başarıyla yüklendi.', 'success')
             image = cv2.imread(filepath)
             results = model.detect([image], verbose=1)
 
@@ -140,16 +180,17 @@ def upload1File():
             pred_path = UPLOAD_PRED_PATH+"/"+predFileName
             visualize.save_instances(
                 image, r['rois'], r['masks'], r['class_ids'], class_names,  r['scores'], path=pred_path)
-            flash("Tespit edilen lezyon adedi: "+str(len(r['class_ids'])))
-            flash("Lezyon Tespit Başarımı: " +
-                  str(sum(r['scores'])/len(r['class_ids'])))
-            
+            flash("Tespit edilen lezyon adedi: " +
+                  str(len(r['class_ids'])), 'light')
+            flash("Lezyon Tespit Başarımı: %{:.2f} ".format( +
+                  (sum(r['scores'])/len(r['class_ids']))*100), 'warning')
+
             title = "MS Detection"
             cap = "MS Detection - Test"
             return render_template('detection.html', title=title, cap=cap+" PRE "+filename, filename=predFileName)
 
         else:
-            flash('İzin verilmeyen dosya uzantısı')
+            flash('İzin verilmeyen dosya uzantısı', 'danger')
             return redirect('msDetection')
     else:
         abort(401)
@@ -157,10 +198,68 @@ def upload1File():
 
 @app.route('/followup')
 def followup():
-
     title = "MS FollowUp "
     cap = "MS FollowUp - Test"
-    return render_template('main.html', title=title, cap=cap)
+    return render_template('followup.html', title=title, cap=cap)
+
+
+@app.route('/upload2File', methods=['POST'])
+def upload2File():
+    if request.method == 'POST':
+        # formdan dosya gelip gelmediğini kontrol edelim
+        if ('firstMR' and 'secondMR') not in request.files:
+            flash('Dosya seçilmedi', 'danger')
+            return redirect('followup')
+
+        f1 = request.files['firstMR']
+        f2 = request.files['secondMR']
+
+        if f1.filename == '' or f2.filename == '':
+            flash('Dosya seçilmedi', 'danger')
+            return redirect('followup')
+
+        if((f1 and uzanti_kontrol(f1.filename)) and (f2 and uzanti_kontrol(f2.filename))) != True:
+            flash('Dosya tipinde hata var. ', 'danger')
+            return redirect('followup')
+        else:
+            filename1 = secure_filename(f1.filename)
+            filename2 = secure_filename(f2.filename)
+
+            filepath1 = os.path.join(app.config['UPLOAD_FOLDER'], filename1)
+            f1.save(filepath1)
+            flash('ilk MR görüntüsü başarıyla yüklendi.', 'success')
+
+            filepath2 = os.path.join(app.config['UPLOAD_FOLDER'], filename2)
+            f2.save(filepath2)
+            flash('ikinci MR görüntüsü başarıyla yüklendi.', 'success')
+
+            class_names = ['BG', 'msMask']
+
+            image1 = cv2.imread(filepath1)
+            results1 = model.detect([image1], verbose=1)
+            r1 = results1[0]
+            predFileName1 = "pre_"+filename1.split('.')[0]+".jpg"
+            pred_path1 = UPLOAD_PRED_PATH+"/"+predFileName1
+            visualize.save_instances(
+                image1, r1['rois'], r1['masks'], r1['class_ids'], class_names,  r1['scores'], path=pred_path1)
+
+            image2 = cv2.imread(filepath2)
+            results2 = model.detect([image2], verbose=1)
+            r2 = results2[0]
+            predFileName2 = "pre_"+filename2.split('.')[0]+".jpg"
+            pred_path2 = UPLOAD_PRED_PATH+"/"+predFileName2
+            visualize.save_instances(
+                image2, r2['rois'], r2['masks'], r2['class_ids'], class_names,  r2['scores'], path=pred_path2)
+            
+            compareResult=compareMasks(r1['masks'], r2['masks'])
+            flash('MSE Skoru: {:.4f}'.format(compareResult),'warning')
+            # print(r1['masks'].shape)
+            # print(r2['masks'].shape)
+
+    title = "Follow-Up Pre"
+    cap = "Follow-Up Preview - Test"
+    
+    return render_template('followupPre.html', title=title, cap=cap, filename1=predFileName1, filename2=predFileName2)
 
 
 @app.route('/about')
