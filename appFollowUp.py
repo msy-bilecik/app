@@ -84,14 +84,6 @@ app.config['MAX_CONTENT_LENGTH'] = 16*1024*1024
 app.secret_key = "msy"
 
 FILETYPES = set(['png', 'jpg', 'jpeg'])
-ColorSet = [(1.0, 1.0, 0.0), (0.5, 1.0, 0.0),  (1.0, 0.0, 0.0),
-            (0.0, 0.5, 1.0), (1, 1, 1)]
-
-# (1.0, 1.0, 0.0) sarı
-# (0.5, 1.0, 0.0) yeşil
-# (1.0, 0.0, 0.0) kırmızı
-# (0.0, 0.5, 1.0) mavi
-# (0.25, 0.25, 0.25) gri
 
 
 def uzanti_kontrol(dosyaadi):
@@ -129,130 +121,78 @@ def mse(imageA, imageB):
     return err
 
 
-def compareMasks(r1, r2):
-    masks1 = r1['masks']
-    masks2 = r2['masks']
+def compareMatrix(masks1, masks2):
+    message = ""
+    ix = masks1.shape[2]
+    iy = masks2.shape[2]
+    cMatrix = np.zeros((ix, iy))
+    bMatrix = np.zeros((ix, iy))
+    likeC = 0
+    tinyC = 0
+    bigC = 0
+    i = 0
+    for i in range(ix):
+        mask1 = masks1[:, :, i]
+        for t in range(iy):
+            mask2 = masks2[:, :, t]
+            mask1Norm = mask1 / np.sqrt(np.sum(mask1**2))
+            mask2Norm = mask2 / np.sqrt(np.sum(mask2**2))
+            simScore = np.sum(mask2Norm*mask1Norm)
+            if(simScore > 0):
+                bMatrix[i, t] = mask2.sum()/mask1.sum()
+                if (bMatrix[i, t] > 0.9 and bMatrix[i, t] < 1.1):
+                    likeC = likeC+1
+                elif (bMatrix[i, t] <= 0.9):
+                    tinyC = tinyC+1
+                elif (bMatrix[i, t] >= 1.1):
+                    bigC = bigC+1
+
+            cMatrix[i, t] = simScore
+            t = t+1
+        i = i+1
+
+    zNew = cMatrix.sum(axis=0)
+    zOld = cMatrix.sum(axis=1)
+    exC = zOld.size-np.count_nonzero(zOld)
+    newC = zNew.size-np.count_nonzero(zNew)
+
+    if(likeC == 0 and bigC == 0 and tinyC == 0):
+        message = "değerlendirme için yeterli benzerlik bulunamadı. "
+    elif(likeC == iy and likeC == ix):
+        message = "lezyonlarda değişim olmamıştır."
+    else:
+        if(likeC > 0):
+            message = message + \
+                "{:.0f} plakda değişim olmamıştır.".format(likeC)
+        if(tinyC > 0):
+            message = message + " {:.0f} plak küçülmüştür.".format(tinyC)
+        if(bigC > 0):
+            message = message + \
+                " {:.0f} plakda büyüme gözlenmiştir.".format(bigC)
+        if(exC > 0):
+            message = message + \
+                " {: .0f} plak gözlenmemiştir.".format(exC)
+        if(newC > 0):
+            message = message + \
+                " {: .0f} yeni plak tespit edilmiştir.".format(newC)
+
+    print(cMatrix)
+    print(bMatrix)
+    return message, cMatrix, bMatrix
 
 
+def compareMasks(masks1, masks2):
+    print(masks1.shape)
+    print(masks2.shape)
+    # print(maskCompound(masks1).shape)
+    # print(maskCompound(masks2).shape)
     if(masks1.shape[0] == masks2.shape[0] and masks1.shape[1] == masks2.shape[1]):
-
-        message = ""
-        ix = masks1.shape[2]
-        iy = masks2.shape[2]
-        zN = np.zeros(iy).astype(int)+4
-        zO = np.zeros(ix).astype(int)
-        ratesR1 = np.zeros(ix)
-        ratesR2 = np.zeros(iy)
-        cMatrix = np.zeros((ix, iy))
-        bMatrix = np.zeros((ix, iy))
-        likeC = 0
-        tinyC = 0
-        bigC = 0
-        i = 0
-        r1 = []
-        r2 = []
-        for i in range(ix):
-            mask1 = masks1[:, :, i]
-            for t in range(iy):
-                mask2 = masks2[:, :, t]
-                mask1Norm = mask1 / np.sqrt(np.sum(mask1**2))
-                mask2Norm = mask2 / np.sqrt(np.sum(mask2**2))
-                simScore = np.sum(mask2Norm*mask1Norm)
-                if(simScore > 0):
-                    bMatrix[i, t] = mask2.sum()/mask1.sum()
-                    if (bMatrix[i, t] > 0.98 and bMatrix[i, t] < 1.02):
-                        likeC = likeC+1
-                        zN[t] = 3
-                        zO[i] = 3
-                        ratesR1[i] = 0
-                        ratesR2[t] = 0
-                    elif (bMatrix[i, t] <= 0.98):
-                        tinyC = tinyC+1
-                        zN[t] = 1
-                        zO[i] = 1
-                        rate = (1 - bMatrix[i, t])*100
-                        ratesR1[i] = rate
-                        ratesR2[t] = rate
-                        flash(" 1 plak  %{:.2f} küçülmüştür. ".format(
-                            rate), "success")
-                    elif (bMatrix[i, t] >= 1.02):
-                        bigC = bigC+1
-                        zN[t] = 2
-                        zO[i] = 2
-                        rate = (bMatrix[i, t] - 1)*100
-                        ratesR1[i] = rate
-                        ratesR2[t] = rate
-                        flash(" 1 plakda %{:.2f} büyüme gözlenmiştir. ".format(
-                            rate), "danger")
-
-                cMatrix[i, t] = simScore
-                t = t+1
-            i = i+1
-        
-        print(zO)
-        print(zN)
-
-        colorsR2 = colorSetting(zN, ColorSet)
-        colorsR1 = colorSetting(zO, ColorSet)
-
-        zNew = bMatrix.sum(axis=0)
-        # print("zNew")
-        # print(zNew)
-
-        zOld = bMatrix.sum(axis=1)
-        # print("zOld")
-        # print(zOld)
-
-        exC = zOld.size-np.count_nonzero(zOld)
-        newC = zNew.size-np.count_nonzero(zNew)
-
-        for i in range(ix):
-            if (zOld[i] == 0):
-                ratesR1[i] = 0
-        for i in range(iy):
-            if (zNew[i] == 0):
-                ratesR2[i] = 0
-
-        if(likeC == 0 and bigC == 0 and tinyC == 0):
-            message = "değerlendirme için yeterli benzerlik bulunamadı. "
-            flash("değerlendirme için yeterli benzerlik bulunamadı. ", "info")
-        elif(likeC == iy and likeC == ix):
-            message = "lezyonlarda değişim olmamıştır."
-            flash("lezyonlarda değişim olmamıştır.", "success")
-        else:
-            if(likeC > 0):
-                message = message + \
-                    "{:.0f} plakda değişim olmamıştır.".format(likeC)
-                flash("{:.0f} plakda değişim olmamıştır.".format(likeC), "info")
-            if(tinyC > 0):
-                message = message + " {:.0f} plak küçülmüştür.".format(tinyC)
-            if(bigC > 0):
-                message = message + \
-                    " {:.0f} plakda büyüme gözlenmiştir.".format(bigC)
-            if(exC > 0):
-                message = message + \
-                    " {: .0f} plak gözlenmemiştir.".format(exC)
-                flash(" {: .0f} plak gözlenmemiştir.".format(exC), "warning")
-            if(newC > 0):
-                message = message + \
-                    " {: .0f} yeni plak tespit edilmiştir.".format(newC)
-                flash(" {: .0f} yeni plak tespit edilmiştir.".format(
-                    newC), "light")
+        message, cMatrix, bMatrix = compareMatrix(masks1, masks2)
 
     else:
         message = "uyumsuz boyut"
-        flash("uyumsuz boyut", "danger")
-        zN = zO = 0
 
-    return message, colorsR1, colorsR2, ratesR1, ratesR2, zO, zN
-
-
-def colorSetting(colorM, ColorSet):
-    colors = []
-    for i in range(len(colorM)):
-        colors.append(ColorSet[int(colorM[i])])
-
-    return colors
+    return message
 
 
 @app.route('/')
@@ -304,7 +244,6 @@ def upload1File():
             predFileName = "pre_"+filename.split('.')[0]+".jpg"
             print(predFileName)
             pred_path = UPLOAD_PRED_PATH+"/"+predFileName
-            class_names = ['BG', 'msPlaque']
             visualize.save_instances(
                 image, r['rois'], r['masks'], r['class_ids'], class_names,  r['scores'], path=pred_path)
             flash("Tespit edilen lezyon adedi: " +
@@ -367,28 +306,19 @@ def upload2File():
             r1 = results1[0]
             predFileName1 = "pre_"+filename1.split('.')[0]+".jpg"
             pred_path1 = UPLOAD_PRED_PATH+"/"+predFileName1
+            visualize.save_instances(
+                image1, r1['rois'], r1['masks'], r1['class_ids'], class_names,  r1['scores'], path=pred_path1)
 
             image2 = cv2.imread(filepath2)
             results2 = model.detect([image2], verbose=1)
             r2 = results2[0]
             predFileName2 = "pre_"+filename2.split('.')[0]+".jpg"
             pred_path2 = UPLOAD_PRED_PATH+"/"+predFileName2
-
-            message, colorsR1, colorsR2, ratesR1, ratesR2, classIDs1, classIDs2 = compareMasks(
-                r1, r2)
-
-            print(ratesR1, ratesR2, classIDs1, classIDs2)
-
-            class_names = ['old', 'smaller','bigger','same','new']
-
             visualize.save_instances(
-                image1, r1['rois'], r1['masks'], classIDs1, class_names, ratesR1,
-                path=pred_path1, colors=colorsR1)
+                image2, r2['rois'], r2['masks'], r2['class_ids'], class_names,  r2['scores'], path=pred_path2)
 
-            visualize.save_instances(
-                image2, r2['rois'], r2['masks'], classIDs2, class_names,  ratesR2,
-                path=pred_path2, colors=colorsR2)
-            #flash(compareResult, 'warning')
+            compareResult = compareMasks(r1['masks'], r2['masks'])
+            flash(compareResult, 'warning')
             # print(r1['masks'].shape)
             # print(r2['masks'].shape)
 

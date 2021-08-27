@@ -66,6 +66,7 @@ def random_colors(N, bright=True):
     hsv = [(i / N, 1, brightness) for i in range(N)]
     colors = list(map(lambda c: colorsys.hsv_to_rgb(*c), hsv))
     random.shuffle(colors)
+    print(colors)
     return colors
 
 
@@ -206,15 +207,14 @@ def save_instances(image, boxes, masks, class_ids, class_names,
 
     # Show area outside image boundaries.
     height, width = image.shape[:2]
-    ax.set_ylim(height + 10, -10)
-    ax.set_xlim(-10, width + 10)
+    ax.set_ylim(height + 1, -1)
+    ax.set_xlim(-1, width + 1)
     ax.axis('off')
     ax.set_title(title)
 
     masked_image = image.astype(np.uint32).copy()
     for i in range(N):
         color = colors[i]
-
         # Bounding box
         if not np.any(boxes[i]):
             # Skip this instance. Has no bbox. Likely lost in image cropping.
@@ -231,15 +231,17 @@ def save_instances(image, boxes, masks, class_ids, class_names,
             class_id = class_ids[i]
             score = scores[i] if scores is not None else None
             label = class_names[class_id]
-            caption = "{} {:.3f}".format(label, score) if score else label
+            caption = "{} %{:.3f}".format(label, score) if score else label
         else:
             caption = captions[i]
-        ax.text(x1, y1 + 8, caption,color='w', size=11, backgroundcolor="none")
+        ax.text(x1, y1-8, caption, color='w',
+                size=15, backgroundcolor="none")
 
         # Mask
         mask = masks[:, :, i]
         if show_mask:
             masked_image = apply_mask(masked_image, mask, color)
+            
 
         # Mask Polygon
         # Pad to ensure proper polygons for masks that touch image edges.
@@ -252,8 +254,10 @@ def save_instances(image, boxes, masks, class_ids, class_names,
             verts = np.fliplr(verts) - 1
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
+    for item in [fig, ax]:
+        item.patch.set_visible(False)
     ax.imshow(masked_image.astype(np.uint8))
-    fig.savefig(path)
+    fig.savefig(path, transparent=True)
     # if auto_show:
     #     plt.show()
 

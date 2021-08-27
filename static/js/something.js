@@ -4,6 +4,7 @@ var infoArea = document.getElementById('upload-label');
 var input2 = document.getElementById('upload2');
 var infoArea2 = document.getElementById('upload2-label');
 
+
 input1.addEventListener('change', showFileName);
 input2.addEventListener('change', showFileName2);
 
@@ -11,7 +12,6 @@ input2.addEventListener('change', showFileName2);
 /*  ==========================================
     SHOW UPLOADED IMAGE
 * ========================================== */
-
 
 
 function readURL(input) {
@@ -23,7 +23,7 @@ function readURL(input) {
                 .attr('src', e.target.result);
         };
         reader.readAsDataURL(input.files[0]);
-        
+
     }
 }
 function readURL2(input) {
@@ -39,7 +39,49 @@ function readURL2(input) {
 
 }
 
+
+/*  ==========================================
+    SHOW UPLOADED IMAGE NAME
+* ========================================== */
+
+
+
+function showFileName(event) {
+    var input = event.srcElement;
+    var fileName = input.files[0].name;
+    infoArea.textContent = 'First MRI: ' + fileName;
+}
+function showFileName2(event) {
+    var input = event.srcElement;
+    var fileName = input.files[0].name;
+    infoArea2.textContent = 'Second MRI: ' + fileName;
+}
+
+
+
+/*  ==========================================
+    same anorher fx
+* ========================================== */
+function showHide(secim) {
+    $("#" + secim).toggle();
+}
+
+
+
+
+
+
+/*  ==========================================
+    same anorher
+* ========================================== */
+
+
+
 $(function () {
+   /* showHide('preOrj1');
+    showHide('preOrj2');
+    showHide('preDetec1'); 
+    showHide('preDetec2');*/
     $('#upload').on('change', function () {
         readURL(input1);
     });
@@ -65,22 +107,6 @@ $(function () {
             form.submit();
         }
     });
+
 });
 
-
-/*  ==========================================
-    SHOW UPLOADED IMAGE NAME
-* ========================================== */
-
-
-
-function showFileName(event) {
-    var input = event.srcElement;
-    var fileName = input.files[0].name;
-    infoArea.textContent = 'First MRI: ' + fileName;
-}
-function showFileName2(event) {
-    var input = event.srcElement;
-    var fileName = input.files[0].name;
-    infoArea2.textContent = 'Second MRI: ' + fileName;
-}

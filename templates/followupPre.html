@@ -11,34 +11,73 @@
 
 {% block content%}
 
-<div class="row py-4">
-    <div class="col-md-6 mx-auto">
+{% with messages= get_flashed_messages(with_categories=true)%}
+{% if messages%}
+<div class="row py-2">
+    {% for category,message in messages %}
+    <div class="col-md-4 mx-auto px-3">
+        <p class=" alert alert-{{category}}" role="alert">{{ message }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+<div class="row py-2">
+    <div class="btn-toolbar m-2 justify-content-center" role="toolbar" aria-label="Toolbar with button groups">
+        <div class="btn-group btn-group-sm m-2 px-1 " role="group" aria-label="Orjinal MRI Show / Hide">
+            <button type="button" class="btn btn-light m-1 rounded" onclick="showHide('preOrj1'); showHide('preOrj2');">Show /
+                Hide
+                Orjinals</button>
+            <button type="button" class="btn btn-light m-1 rounded" onclick="showHide('preOrj1');">Show / Hide First Orj.
+                MRI</button>
+            <button type="button" class="btn btn-light m-1 rounded" onclick="showHide('preOrj2');">Show / Hide Second Orjinal
+                MRI</button>
+        </div>
+        <div class="btn-group btn-group-sm m-2 px-1" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-light m-1 rounded" onclick="showHide('preDetec1'); showHide('preDetec2');">Show
+                /
+                Hide
+                Results</button>
+            <button type="button" class="btn btn-light m-1 rounded" onclick="showHide('preDetec1');">Show / Hide First MRI
+                Results</button>
+            <button type="button" class="btn btn-light m-1 rounded" onclick="showHide('preDetec2');">Show / Hide Second MRI
+                Results</button>
+        </div>
+    </div>
+</div>
+<div class="row py-2" id="preDetecAll">
+    <div class="col-md-6 mx-auto" id="preDetec1">
         <!-- Uploaded image area-->
-        <p class="font-italic text-white text-center mt-4">First MR image.</p>
+        <p class="font-italic text-white text-center mt-4">First MR Slice with Plaques</p>
         <div class="image-area mt-2"><img id="detectedFile" src="{{url_for('detecFile',filename=filename1)}}" alt=""
                 class="img-fluid rounded shadow-sm mx-auto d-block">
         </div>
     </div>
-    <div class="col-md-6 mx-auto">
-        <p class="font-italic text-white text-center mt-4">Second MR image </p>
+    <div class="col-md-6 mx-auto" id="preDetec2">
+        <p class="font-italic text-white text-center mt-4">Second MR Slice with Plaques</p>
         <div class="image-area mt-2"><img id="detectedFile" src="{{url_for('detecFile',filename=filename2)}}" alt=""
                 class="img-fluid rounded shadow-sm mx-auto d-block">
         </div>
     </div>
+
+    <div class="col-md-6 mx-auto" id="preOrj1">
+        <!-- Uploaded image area-->
+        <p class="font-italic text-white text-center mt-4">First Orjinal MR Slice</p>
+        <div class="image-area mt-2"><img id="detectedFile" src="{{url_for('detecFile',filename=orgFilename1)}}" alt=""
+                class="img-fluid rounded shadow-sm mx-auto d-block">
+        </div>
+    </div>
+    <div class="col-md-6 mx-auto" id="preOrj2">
+        <p class="font-italic text-white text-center mt-4">Second Orjinal MR Slice</p>
+        <div class="image-area mt-2"><img id="detectedFile" src="{{url_for('detecFile',filename=orgFilename2)}}" alt=""
+                class="img-fluid rounded shadow-sm mx-auto d-block">
+        </div>
+    </div>
 </div>
-
-
-{% with messages= get_flashed_messages(with_categories=true)%}
-{% if messages%}
-{% for category,message in messages %}
-<div class="alert alert-{{category}}" role="alert">{{ message }}</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
-
 
 <div class="input-group-append">
     <a href="{{url_for('followup')}}"> <input class="btn btn-secondary m-2 rounded-pill px-4 w-100"
             value="New Follow-Up"></a>
 </div>
+
 {% endblock %}
