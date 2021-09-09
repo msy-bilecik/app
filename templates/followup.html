@@ -4,68 +4,84 @@
 {{ title }}
 {% endblock %}
 
-
-{% block cap %}
-{{ cap }}
-{% endblock %}
-
 {% block content%}
-
-{% with messages= get_flashed_messages(with_categories=true)%}
-{% if messages%}
-{% for category,message in messages %}
-<div class="alert alert-{{category}}" role="alert">{{ message }}</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
-
-<form action="{{url_for('upload2File')}}" method="post" enctype="multipart/form-data" id="baseForm" name="baseForm">
-    <div class="row py-4">
-        <div class="col-md-6 mx-auto">
-            <!-- Upload image input-->
-            <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
-                <input id="upload" type="file" onchange="readURL(this);" class="form-control border-0" name="firstMR">
-                <label id="upload-label" for="upload" class="font-weight-light text-muted">Choose first MRI slice</label>
-            </div>
-        </div>
-        <div class="col-md-6 mx-auto">
-            <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
-                <input id="upload2" type="file" onchange="readURL2(this);" class="form-control border-0"
-                    name="secondMR">
-                <label id="upload2-label" for="upload2" class="font-weight-light text-muted">Choose second MRI
-                    slice</label>
-
-            </div>
-        </div>
-
-        <div class="input-group-append">
-            <input type="submit" onclick="checkFiles()" class="btn btn-secondary m-2 rounded-pill px-4 w-100" value="Find Change">
-        </div>
-
-        <div class="col-md-6 mx-auto">
-            <!-- Uploaded image area-->
-            <p class="font-italic text-white text-center mt-4">First MR slice</p>
-            <div class="image-area mt-2"><img id="imageResult" src="#" alt=""
-                    class="img-fluid rounded shadow-sm mx-auto d-block">
-            </div>
-        </div>
-        <div class="col-md-6 mx-auto">
-            <p class="font-italic text-white text-center mt-4">Second MR slice</p>
-            <div class="image-area mt-2"><img id="imageResult2" src="#" alt=""
-                    class="img-fluid rounded shadow-sm mx-auto d-block">
-            </div>
-        </div>
+<!-- ======= Detection Section ======= -->
+<section id="detectionHero">
+    <div class="detectionHero-container">
+        <h1>{{cap}} Hoşgeldiniz.</h1>
+        <h2><u>M</u>ultiple <u>S</u>clerosis Hastalarının MR görüntülerinde MS
+            tespitini(<u>D</u>etection) yapan, <br /> ve (<u>A</u>nd) değişim takibi
+            (<u>F</u>ollow-Up) imkanı tanıyan bir web platformu olan sayfamıza hoşgeldiniz. </h2>
     </div>
-</form>
+</section><!-- #detection -->
+<main id="main">
+    <section id="followup" class="followup">
+        <div class="container">
+
+            {% with messages= get_flashed_messages(with_categories=true)%}
+            {% if messages%}
+            {% for category,message in messages %}
+            <div class="alert alert-{{category}}" role="alert">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form action="{{url_for('msFollowUp')}}" method="post" enctype="multipart/form-data" id="baseForm"
+                name="baseForm">
+                <div class="row py-4">
+                    <div class="col-md-6 mx-auto">
+                        <!-- Upload image input-->
+                        <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm ">
+                            <input id="upload1" type="file" onchange="readURL(this);"
+                                class="form-control-lg border-0 bg-dark" name="firstMR" required>
+                            <label id="upload1-label" for="upload1" class="font-weight-light text-muted">Choose first
+                                MRI
+                                slice</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mx-auto">
+                        <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
+                            <input id="upload2" type="file" onchange="readURL2(this);" class="form-control-lg border-0"
+                                name="secondMR">
+                            <label id="upload2-label" for="upload2" class="font-weight-light text-muted">Choose second
+                                MRI
+                                slice</label>
+
+                        </div>
+                    </div>
+
+                    <div class="input-group-append">
+                        <input type="submit" onclick="checkFiles()"
+                            class="btn btn-secondary m-2 rounded-pill px-4 w-100" value="Find Change">
+                    </div>
+
+                    <div class="col-md-6 mx-auto">
+                        <!-- Uploaded image area-->
+                        <p class="font-italic text-white text-center mt-4">First MR slice</p>
+                        <div class="image-area mt-2"><img id="imageResult" src="#" alt=""
+                                class="img-fluid rounded shadow-sm mx-auto d-block">
+                        </div>
+                    </div>
+                    <div class="col-md-6 mx-auto">
+                        <p class="font-italic text-white text-center mt-4">Second MR slice</p>
+                        <div class="image-area mt-2"><img id="imageResult2" src="#" alt=""
+                                class="img-fluid rounded shadow-sm mx-auto d-block">
+                        </div>
+                    </div>
+                </div>
+            </form>
 
 
 
-{% if filename %}
+            {% if filename %}
 
-<p class="font-italic text-white text-center">Yapılan inceleme sonucunda tespit edilen lezyonların görünüşü</p>
-<div class="image-area mt-4"><img id="imageResult" src="{{url_for('detecFile',filename=filename)}}" alt=""
-        class="img-fluid rounded shadow-sm mx-auto d-block">
-
-    {% endif %}
-
-    {% endblock %}
+            <p class="font-italic text-white text-center">Yapılan inceleme sonucunda tespit edilen lezyonların görünüşü
+            </p>
+            <div class="image-area mt-4"><img id="imageResult" src="{{url_for('detecFile',filename=filename)}}" alt=""
+                    class="img-fluid rounded shadow-sm mx-auto d-block">
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</main>
+{% endblock %}

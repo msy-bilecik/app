@@ -4,51 +4,71 @@
 {{ title }}
 {% endblock %}
 
-
-{% block cap %}
-{{ cap }}
-{% endblock %}
-
 {% block content%}
-<form action="{{url_for('upload1File')}}" method="post" enctype="multipart/form-data">
-    <div class="row py-4">
-        <div class="col-lg-6 mx-auto">
+<!-- ======= Detection Section ======= -->
+<section id="detectionHero">
+    <div class="detectionHero-container">
+        <h1>{{cap}} Hoşgeldiniz.</h1>
+        <h2><u>M</u>ultiple <u>S</u>clerosis Hastalarının MR görüntülerinde MS
+            tespitini(<u>D</u>etection) yapan, <br /> ve (<u>A</u>nd) değişim takibi
+            (<u>F</u>ollow-Up) imkanı tanıyan bir web platformu olan sayfamıza hoşgeldiniz. </h2>
+    </div>
+</section><!-- #detection -->
 
-            <!-- Upload image input-->
-            <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
-                <input id="upload" type="file" onchange="readURL(this);" class="form-control border-0" name="fname">
-                <label id="upload-label" for="upload" class="font-weight-light text-muted">Select a MR Slice</label>
-                <div class="input-group-append">
-                    <input type="submit" class="btn btn-light m-0 rounded-pill px-4" value="Upload">
+<main id="main">
+    <section id="followup" class="followup">
+        <div class="container">
+            <div class="row py-4 col-lg-8 mx-auto">
+                <form action="{{url_for('msDetec')}}" method="post" enctype="multipart/form-data">
 
+                    <div class=" mx-auto">
+
+                        <!-- Upload image input-->
+                        <div class="input-group mb-3 px-2 py-2 rounded-top bg-white shadow-sm">
+                            <input id="upload0" type="file" onchange="readURL(this);" class="form-control border-0"
+                                name="fname">
+                            <label id="upload0-label" for="upload0" class="font-weight-light text-muted">Select a MR
+                                Slice</label>
+                        </div>
+                        <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
+                            <input id="uploadJson" type="file" onchange="" class="form-control border-0"
+                                name="jsonfname">
+                            <label id="uploadJson-label" for="uploadJson" class="font-weight-light text-muted">
+                                Select a Grount-Trouth File (coco style) </label>
+                        </div>
+                        <div class="input-group mb-3 px-5 py-2 mx-auto rounded-pill bg-success shadow-sm">
+                            <input type="submit" class="btn btn-success rounded-pill px-4 w-100 justify-content-center"
+                                value="Upload">
+                        </div>
+
+                    </div>
+                </form>
+                <!-- Uploaded image area-->
+                <p class="font-italic text-white text-center">MR Slice</p>
+                <div class="image-area mt-4 col-lg-8 mx-auto"><img id="imageResult" src="#" alt=""
+                        class="img-fluid rounded shadow-sm mx-auto d-block">
                 </div>
 
+
+
+                {% with messages= get_flashed_messages(with_categories=true)%}
+                {% if messages%}
+                {% for category,message in messages %}
+                <div class="alert alert-{{category}}" role="alert">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                {% if filename %}
+
+                <p class="font-italic text-white text-center">The appearance of the lesions found on the slice</p>
+                <div class="image-area mt-4"><img id="imageResult" src="{{url_for('detecFile',filename=filename)}}"
+                        alt="" class="img-fluid rounded shadow-sm mx-auto d-block">
+                </div>
+                {% endif %}
+
             </div>
-
-
-</form>
-<!-- Uploaded image area-->
-<p class="font-italic text-white text-center">MR Slice</p>
-<div class="image-area mt-4"><img id="imageResult" src="#" alt="" class="img-fluid rounded shadow-sm mx-auto d-block">
-</div>
-
-</div>
-</div>
-
-{% with messages= get_flashed_messages(with_categories=true)%}
-{% if messages%}
-{% for category,message in messages %}
-<div class="alert alert-{{category}}" role="alert">{{ message }}</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
-
-{% if filename %}
-
-<p class="font-italic text-white text-center">The appearance of the lesions found on the slice</p>
-<div class="image-area mt-4"><img id="imageResult" src="{{url_for('detecFile',filename=filename)}}" alt=""
-        class="img-fluid rounded shadow-sm mx-auto d-block">
-
-    {% endif %}
-
-    {% endblock %}
+        </div>
+    </section>
+</main>
+{% endblock %}

@@ -27,6 +27,8 @@
 #import math
 #import random
 import numpy 
+import cv2
+from numpy.lib.arraysetops import union1d
 #import tensorflow as tf
 #import scipy
 #import skimage.color
@@ -42,9 +44,11 @@ from scipy.ndimage.morphology import distance_transform_edt, binary_erosion,\
 from scipy.ndimage.measurements import label, find_objects
 from scipy.stats import pearsonr
 
+
 # own modules
 
 # code
+
 def dc(result, reference):
     r"""
     Dice coefficient

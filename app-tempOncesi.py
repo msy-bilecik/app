@@ -8,7 +8,7 @@ from mrcnn import utils
 import configFile
 from py import metricQc
 from py import metreE
-from py import util  
+from py import util
 from keras.preprocessing import image
 from keras.models import load_model
 from tensorflow import keras
@@ -259,6 +259,7 @@ def colorSetting(colorM, ColorSet):
 
     return colors
 
+
 @app.route('/')
 def index():
     title = "Homepage"
@@ -267,24 +268,11 @@ def index():
     return render_template('main.html', title=title, cap=cap, content=content)
 
 
-@app.route('/msShow')
-def msShow():
-    title = cap = "MS Show"
-    return render_template('detection.html', title=title, cap=cap)
-
 @app.route('/msDetection')
 def msDetection():
-    title = "MS Tespiti"
-    cap = "MS Tespiti - Test"
+    title = "MS Detection"
+    cap = "MS Detection - Test"
     return render_template('detection.html', title=title, cap=cap)
-
-
-@app.route('/msDetectionCompare')
-def msDetectionCompare():
-    title = "Otomatik MS Tespiti"
-    cap = "Otomatik MS Tespiti - Test"
-    return render_template('detection.html', title=title, cap=cap)
-
 
 
 @app.route('/msDetection/<filename>')
@@ -394,21 +382,8 @@ def msDetec():
         abort(401)
 
 
-@app.route('/msShowFollowUp')
-def msShowFollowUp():
-    title = "MS FollowUp "
-    cap = "MS FollowUp - Test"
-    return render_template('followup.html', title=title, cap=cap)
-
-@app.route('/FollowUp')
-def FollowUp():
-    title = "MS FollowUp "
-    cap = "MS FollowUp - Test"
-    return render_template('followup.html', title=title, cap=cap)
-
-
-@app.route('/msFollowUpCompare')
-def msFollowUpCompare():
+@app.route('/followup')
+def followup():
     title = "MS FollowUp "
     cap = "MS FollowUp - Test"
     return render_template('followup.html', title=title, cap=cap)

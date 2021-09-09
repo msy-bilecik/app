@@ -1,0 +1,34 @@
+{% extends 'base.html'%}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content%}
+<div class="container">
+    <h1 class="m-2">{{cap}}</h1>
+    <div class="row py-4 col-lg-8 mx-auto">
+
+        {% with messages= get_flashed_messages(with_categories=true)%}
+        {% if messages%}
+        <div class="row py-2">
+            {% for category,message in messages %}
+            <div class="col-md-4 mx-auto px-3">
+                <p class=" alert alert-{{category}}" role="alert">{{ message }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% if filename %}
+
+        <p class="font-italic text-white text-center">The appearance of the lesions found on the slice</p>
+        <div class="image-area mt-4"><img id="imageResult" src="{{url_for('detecFile',filename=filename)}}" alt=""
+                class="img-fluid rounded shadow-sm mx-auto d-block">
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
