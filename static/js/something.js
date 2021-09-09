@@ -1,46 +1,15 @@
-var input1 = document.getElementById('upload1');
-var infoArea1 = document.getElementById('upload1-label');
-
-var input2 = document.getElementById('upload2');
-var infoArea2 = document.getElementById('upload2-label');
-
-var input0 = document.getElementById('upload0');
-var infoArea0 = document.getElementById('upload0-label');
-
-var inputJ = document.getElementById('uploadJson');
-var infoAreaJ = document.getElementById('uploadJson-label');
-
-input0.addEventListener('change', showFileName0);
-inputJ.addEventListener('change', showFileNameJ);
-input1.addEventListener('change', showFileName1);
-input2.addEventListener('change', showFileName2);
 
 
 /*  ==========================================
     SHOW UPLOADED IMAGE NAME
 * ========================================== */
 
-function showFileName0(event) {
-    var input = event.srcElement;
-    var fileName = input.files[0].name;
-    infoArea0.textContent = 'MRI File: ' + fileName;
-}
-function showFileNameJ(event) {
-    var input = event.srcElement;
-    var fileName = input.files[0].name;
-    infoAreaJ.textContent = 'Json File: ' + fileName;
-}
-
-
-function showFileName1(event) {
-    var input = event.srcElement;
-    var fileName = input.files[0].name;
-    infoArea1.textContent = 'First MRI: ' + fileName;
-}
-function showFileName2(event) {
-    var input = event.srcElement;
-    var fileName = input.files[0].name;
-    infoArea2.textContent = 'Second MRI: ' + fileName;
+function showFileName(input,id,text) {
+    var infoArea = document.getElementById(id);
+    if (input.files && input.files[0]) {
+        var fileName = input.files[0].name;
+        infoArea.textContent = text + fileName;
+    }
 }
 
 
@@ -95,10 +64,10 @@ function showHide(secim) {
 
 
 $(function () {
-   /* showHide('preOrj1');
-    showHide('preOrj2');
-    showHide('preDetec1'); 
-    showHide('preDetec2');*/
+    /* showHide('preOrj1');
+     showHide('preOrj2');
+     showHide('preDetec1'); 
+     showHide('preDetec2');*/
     $('#upload0').on('change', function () {
         readURL(input0);
     });
