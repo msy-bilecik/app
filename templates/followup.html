@@ -19,66 +19,70 @@
         <div class="container">
             <div id="row mx-auto">
                 <div id="col-md-4">
-                    <a href="{{url_for('static',filename='testSet1.zip')}}">Örnek Test Set</a>
+                    <h4>
+                        <div class="fs-2 mb-3"><i class="bi bi-file-zip"></i>
+                            <a href="{{url_for('static',filename='testSet1.zip')}}">Örnek Test Set </a>
+                    </h4>
                 </div>
             </div>
-            <form action="{{fx}}" method="post" enctype="multipart/form-data" id="baseForm" name="baseForm">
-                <div class="row py-4">
-                    <div class="col-md-6 mx-auto">
-                        <!-- Upload image input-->
-                        <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm ">
-                            <input id="upload1" type="file"
-                                onchange="showFileName(this,'upload1-label','First MRI : ');readURL(this);"
-                                class="form-control-lg border-0 bg-dark" name="firstMR" required>
-                            <label id="upload1-label" for="upload1" class="font-weight-light text-muted">Choose first
-                                MRI slice</label>
-                        </div>
+        </div>
+        <form action="{{fx}}" method="post" enctype="multipart/form-data" id="baseForm" name="baseForm">
+            <div class="row py-4">
+                <div class="col-md-6 mx-auto">
+                    <!-- Upload image input-->
+                    <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm ">
+                        <input id="upload1" type="file"
+                            onchange="showFileName(this,'upload1-label','First MRI : ');readURL(this);"
+                            class="form-control-lg border-0 bg-dark" name="firstMR" required>
+                        <label id="upload1-label" for="upload1" class="font-weight-light text-muted">Choose first
+                            MRI slice</label>
                     </div>
-                    <div class="col-md-6 mx-auto">
-                        <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
-                            <input id="upload2" type="file"
-                                onchange="showFileName(this,'upload2-label','Second MRI : ');readURL2(this);"
-                                class="form-control-lg border-0" name="secondMR" required>
-                            <label id="upload2-label" for="upload2" class="font-weight-light text-muted">Choose second
-                                MRI slice</label>
+                </div>
+                <div class="col-md-6 mx-auto">
+                    <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
+                        <input id="upload2" type="file"
+                            onchange="showFileName(this,'upload2-label','Second MRI : ');readURL2(this);"
+                            class="form-control-lg border-0" name="secondMR" required>
+                        <label id="upload2-label" for="upload2" class="font-weight-light text-muted">Choose second
+                            MRI slice</label>
 
-                        </div>
-                    </div>
-                    {%if json1%}
-                    <div class=" col-md-12 mx-auto ">
-                        <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
-                            <input id="uploadJson" type="file"
-                                onchange="showFileName(this,'uploadJson-label','Json File : ');"
-                                class="form-control-lg border-0" name="jsonfname" required>
-                            <label id="uploadJson-label" for="uploadJson" class="font-weight-light text-muted">
-                                Select a Grount-Trouth File (coco style) </label>
-                        </div>
-                    </div>
-                    {%endif%}
-                    <div class=" col-md-12 mx-auto ">
-                        <div class="input-group mb-3 px-2 py-2 rounded-pill bg-success shadow-sm">
-                            <input type="submit" onclick="checkFiles()"
-                                class=" form-control-lg btn btn-success rounded-pill px-4 w-100 justify-content-center"
-                                value="Let's Follow-Up">
-                        </div>
                     </div>
                 </div>
-            </form>
-            <div class="row">
-                <div class="col-md-6 mx-auto">
-                    <!-- Uploaded image area-->
-                    <p class="font-italic text-black-50 text-center mt-4">First MR slice</p>
-                    <div class="image-area mt-2"><img id="imageResult" src="#" alt=""
-                            class="img-fluid rounded shadow-sm mx-auto d-block">
+                {%if json1%}
+                <div class=" col-md-12 mx-auto ">
+                    <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
+                        <input id="uploadJson" type="file"
+                            onchange="showFileName(this,'uploadJson-label','Json File : ');"
+                            class="form-control-lg border-0" name="jsonfname" required>
+                        <label id="uploadJson-label" for="uploadJson" class="font-weight-light text-muted">
+                            Select a Grount-Trouth File (coco style) </label>
                     </div>
                 </div>
-                <div class="col-md-6 mx-auto">
-                    <p class="font-italic text-black-50 text-center mt-4">Second MR slice</p>
-                    <div class="image-area mt-2"><img id="imageResult2" src="#" alt=""
-                            class="img-fluid rounded shadow-sm mx-auto d-block">
+                {%endif%}
+                <div class=" col-md-12 mx-auto ">
+                    <div class="input-group mb-3 px-2 py-2 rounded-pill bg-success shadow-sm">
+                        <input type="submit" onclick="checkFiles()"
+                            class=" form-control-lg btn btn-success rounded-pill px-4 w-100 justify-content-center"
+                            value="Let's Follow-Up">
                     </div>
                 </div>
             </div>
+        </form>
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <!-- Uploaded image area-->
+                <p class="font-italic text-black-50 text-center mt-4">First MR slice</p>
+                <div class="image-area mt-2"><img id="imageResult" src="#" alt=""
+                        class="img-fluid rounded shadow-sm mx-auto d-block">
+                </div>
+            </div>
+            <div class="col-md-6 mx-auto">
+                <p class="font-italic text-black-50 text-center mt-4">Second MR slice</p>
+                <div class="image-area mt-2"><img id="imageResult2" src="#" alt=""
+                        class="img-fluid rounded shadow-sm mx-auto d-block">
+                </div>
+            </div>
+        </div>
         </div>
     </section>
 </main>
