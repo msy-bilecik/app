@@ -18,34 +18,26 @@
 <main id="main">
     <section id="followup" class="followup">
         <div class="container">
-            <div id="row mx-auto">
-                <div id="col-md-4">
-                    <a href="{{url_for('static',filename='testSet1.zip' )}}">Örnek Test Set</a>
-                </div>
-            </div>
-
             <div class="row py-4 col-lg-8 mx-auto">
-                <form action="{{fx}}" method="post" enctype="multipart/form-data">
+                <form action="{{url_for('msDetec')}}" method="post" enctype="multipart/form-data">
+
                     <div class=" mx-auto">
+
                         <!-- Upload image input-->
                         <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
                             <input id="upload0" type="file"
                                 onchange="showFileName(this,'upload0-label','MRI File : ');readURL(this);"
-                                class="form-control border-0" name="fname" required>
+                                class="form-control border-0" name="fname">
                             <label id="upload0-label" for="upload0" class="font-weight-light text-muted">Select a MR
                                 Slice</label>
                         </div>
-
-                        {%if json1%}
                         <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
                             <input id="uploadJson" type="file"
                                 onchange="showFileName(this,'uploadJson-label','Json File : ');"
-                                class="form-control border-0" name="jsonfname" required>
+                                class="form-control border-0" name="jsonfname">
                             <label id="uploadJson-label" for="uploadJson" class="font-weight-light text-muted">
                                 Select a Grount-Trouth File (coco style) </label>
                         </div>
-                        {%endif%}
-
                         <div class="input-group mb-3 px-5 py-2 mx-auto rounded-pill bg-success shadow-sm">
                             <input type="submit" class="btn btn-success rounded-pill px-4 w-100 justify-content-center"
                                 value="Upload">
@@ -54,10 +46,29 @@
                     </div>
                 </form>
                 <!-- Uploaded image area-->
-                <p class="font-italic text-black-50 text-center mt-2">MR Slice</p>
-                <div class="image-area col-lg-8 mx-auto"><img id="imageResult" src="#" alt=""
+                <p class="font-italic text-black-50 text-center">MR Slice</p>
+                <div class="image-area mt-4 col-lg-8 mx-auto"><img id="imageResult" src="#" alt=""
                         class="img-fluid rounded shadow-sm mx-auto d-block">
                 </div>
+
+
+
+                {% with messages= get_flashed_messages(with_categories=true)%}
+                {% if messages%}
+                {% for category,message in messages %}
+                <div class="alert alert-{{category}}" role="alert">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                {% if filename %}
+
+                <p class="font-italic text-white text-center">The appearance of the lesions found on the slice</p>
+                <div class="image-area mt-4"><img id="imageResult" src="{{url_for('detecFile',filename=filename)}}"
+                        alt="" class="img-fluid rounded shadow-sm mx-auto d-block">
+                </div>
+                {% endif %}
+
             </div>
         </div>
     </section>

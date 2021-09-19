@@ -61,7 +61,11 @@ section {
 .section-title p {
   margin-bottom: 0;
 }
-
+@media (max-width: 768px) {
+  section {
+  padding: 30px 0;
+  }
+}
 /*--------------------------------------------------------------
 # Breadcrumbs
 --------------------------------------------------------------*/
@@ -1084,9 +1088,12 @@ section {
 
 #detectionHero h2 {
   color: #eee;
+  margin:0 auto;
   margin-bottom: 50px;
+  margin-top: 10px;
   font-size: 20px;
   font-weight: 300;
+  width: 50%;
 }
 
 #detectionHero .btn-get-started {

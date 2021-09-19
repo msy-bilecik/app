@@ -77,7 +77,7 @@ $(function () {
     $('#upload2').on('change', function () {
         readURL2(input2);
     });
-    $("form[name='baseForm']").validate({
+   /* $("form[name='baseForm']").validate({
         rules: {
             // The key name on the left side is the name attribute
             // of an input field. Validation rules are defined
@@ -94,7 +94,7 @@ $(function () {
         submitHandler: function (form) {
             form.submit();
         }
-    });
+    });*/
 
 });
 

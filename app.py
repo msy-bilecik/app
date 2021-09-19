@@ -8,7 +8,7 @@ from mrcnn import utils
 import configFile
 from py import metricQc
 from py import metreE
-from py import util  
+from py import util
 from keras.preprocessing import image
 from keras.models import load_model
 from tensorflow import keras
@@ -138,7 +138,10 @@ def mse(imageA, imageB):
 def compareMasks(r1, r2):
     masks1 = r1['masks']
     masks2 = r2['masks']
+    return compareM(masks1, masks2)
 
+
+def compareM(masks1, masks2):
     if(masks1.shape[0] == masks2.shape[0] and masks1.shape[1] == masks2.shape[1]):
 
         message = ""
@@ -259,41 +262,139 @@ def colorSetting(colorM, ColorSet):
 
     return colors
 
+
 @app.route('/')
 def index():
-    title = "Homepage"
+    title = "MS-DAF"
     cap = "Homepage - Test"
     content = "Multiple Sclerosis Detection And Follow-up System Test Page"
     return render_template('main.html', title=title, cap=cap, content=content)
 
 
-@app.route('/msShow')
-def msShow():
-    title = cap = "MS Show"
-    return render_template('detection.html', title=title, cap=cap)
-
-@app.route('/msDetection')
-def msDetection():
-    title = "MS Tespiti"
-    cap = "MS Tespiti - Test"
-    return render_template('detection.html', title=title, cap=cap)
-
-
-@app.route('/msDetectionCompare')
-def msDetectionCompare():
-    title = "Otomatik MS Tespiti"
-    cap = "Otomatik MS Tespiti - Test"
-    return render_template('detection.html', title=title, cap=cap)
-
-
-
-@app.route('/msDetection/<filename>')
+@app.route('/showPic/<filename>')
 def detecFile(filename):
     return redirect(url_for('static', filename='uploadFolder/'+filename), code=301)
 
 
-@app.route('/msDetec', methods=['POST'])
-def msDetec():
+@app.route('/msShow')
+def msShow():
+    title = "MS-DAF - MS Görüntüleme"
+    cap = "Uzman Hekimin Belirlediği MS Plaklarının Görüntülenmesi"
+    abstract = "Hekimlerin işaretledikleri MS plaklarını sergileyen uygulama sayfamızdır. Bunun için MR kesiti ve VGG 1.0.6 formatında segmentasyon dosyanızı yüklemelisiniz. "
+    fxUrl = url_for("msSliceShow")
+    json = True
+    return render_template('detection.html', title=title, cap=cap, abstract=abstract, fx=fxUrl, json1=json)
+
+
+@app.route('/msDetection')
+def msDetection():
+    title = "MS-DAF - MS Tespiti"
+    cap = "MR Görüntüsü Üzerinde Otomatik MS Tespiti"
+    abstract = "MR görüntüleri üzerinde otomatik olarak plak tespiti yapan uygulama sayfamızdır. Bunun için MR kesitinizi yüklemeniz yeterlidir. "
+    fxUrl = url_for("msFinder")
+    return render_template('detection.html', title=title, cap=cap, abstract=abstract, fx=fxUrl)
+
+
+@app.route('/msDetectionCompare')
+def msDetectionCompare():
+    title = "MS-DAF - Karşılaştırmalı MS Tespiti"
+    cap = "Karşılaştırmalı MS Tespiti"
+    abstract = "MR görüntüleri üzerinde otomatik olarak plak tespiti ve uzman hekim görüşü ile karşılaştırmasını yapan uygulama sayfamızdır. Bunun için MR kesiti ve VGG 1.0.6 formatında segmentasyon dosyanızı yüklemelisiniz. "
+    fxUrl = url_for("msFinderCompare")
+    json = True
+    return render_template('detection.html', title=title, cap=cap, abstract=abstract, fx=fxUrl, json1=json)
+
+################# Follow -Up Links##########
+
+
+@app.route('/msFollowUp')
+def msFollowUp():
+    title = "MS-DAF - MS FollowUp "
+    cap = "MS Takibi"
+    abstract = "Hekimlerin işaretledikleri MS plaklarını sergileyen, farklı iki periyotta alınmış görüntüleri karşılaştıran uygulama sayfamızdır. Bunun için 2 MR kesiti ve VGG 1.0.6 formatında segmentasyon dosyanızı yüklemelisiniz. "
+    fxUrl = url_for("msFollowUpShow")
+    json = True
+    return render_template('followup.html',  title=title, cap=cap, abstract=abstract, fx=fxUrl, json1=json)
+
+
+@app.route('/msOtoFollowUp')
+def msOtoFollowUp():
+    title = "MS-DAF - MS FollowUp "
+    cap = "Otomatik MS Takibi"
+    abstract = "Farklı iki periyotta alınmış MR görüntüleri üzerindeki lezyonları tespit ederek karşılaştıran uygulama sayfamızdır. Bunun için 2 MR kesiti dosyanızı yüklemelisiniz. "
+    fxUrl = url_for("msFollowUpFinder")
+    return render_template('followup.html',  title=title, cap=cap, abstract=abstract, fx=fxUrl)
+
+
+@app.route('/msFollowUpCompare')
+def msFollowUpCompare():
+    title = "MS-DAF - MS FollowUp "
+    cap = "Otomatik Karşılaştırmalı MS Takibi"
+    abstract = "Hekimlerin işaretledikleri MS plaklarını sergileyen, farklı iki periyotta alınmış görüntüleri karşılaştıran uygulama sayfamızdır. Bunun için MR kesiti ve VGG 1.0.6 formatında segmentasyon dosyanızı yüklemelisiniz. "
+    fxUrl = url_for("msFollowUpCompareShow")
+    json = True
+    return render_template('followup.html',  title=title, cap=cap, abstract=abstract, fx=fxUrl, json1=json)
+
+
+@app.route('/msSliceShow', methods=['POST'])
+def msSliceShow():
+    if request.method == 'POST':
+        # formdan dosya gelip gelmediğini kontrol edelim
+        if 'fname' not in request.files:
+            flash('Dosya seçilmedi', 'danger')
+            return redirect('msShow')
+
+            # kullanıcı dosya seçmemiş ve tarayıcı boş isim göndermiş mi
+        f = request.files['fname']
+        fJson = request.files['jsonfname']
+        if f.filename == '':
+            flash('Dosya seçilmedi', 'danger')
+            return redirect('msShow')
+
+            # gelen dosyayı güvenlik önlemlerinden geçir
+        if f and uzanti_kontrol(f.filename) and fJson and uzanti_kontrolJson(fJson.filename):
+
+            filename = secure_filename(f.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            f.save(filepath)
+
+            flash('Dosya başarıyla yüklendi.', 'success')
+            image = cv2.imread(filepath)
+            class_names = ['BG', 'msMask']
+            jsonFile = str(uuid.uuid4())+".json"
+            filenameJ = secure_filename(jsonFile)
+            filepathJ = os.path.join(app.config['UPLOAD_FOLDER'], filenameJ)
+            fJson.save(filepathJ)
+            dataset = configFile.MsMaskDataset()
+            dataset.sload_msMask(app.config['UPLOAD_FOLDER'], filepathJ)
+            dataset.prepare()
+            image1, image_meta, gt_class_id, gt_bbox, gt_mask =\
+                modellib.load_image_gt(
+                    dataset, config, 0, use_mini_mask=False)
+            info = dataset.image_info[0]
+
+            GTFileName = "GT_"+filename.split('.')[0]+".jpg"
+            GTFilePath = UPLOAD_PRED_PATH+"/"+GTFileName
+            visualize.save_instances(
+                image1, gt_bbox, gt_mask, gt_class_id, class_names, path=GTFilePath)
+
+            title = "MS-DAF - MS Görüntüleme"
+            cap = "MS Görüntüleme"
+            abstract = filename.split('.')[
+                0]+" dosyasının uzman hekim görüşleri ile belirtilen plak(ları) aşağıda detaylı olarak görülmektedir."
+
+            return render_template('detectionPre.html', title=title, cap=cap, abstract=abstract,
+                                   GTFileName=GTFileName, orjFile=filename)
+
+        else:
+            flash('İzin verilmeyen dosya uzantısı', 'danger')
+            return redirect('msShow')
+    else:
+        abort(401)
+
+
+@app.route('/msFinder', methods=['POST'])
+def msFinder():
     if request.method == 'POST':
         # formdan dosya gelip gelmediğini kontrol edelim
         if 'fname' not in request.files:
@@ -328,13 +429,62 @@ def msDetec():
             flash("Tespit edilen lezyon adedi: " +
                   str(len(r['class_ids'])), 'light')
 
-            f1 = request.files['jsonfname']
-            if f1 and uzanti_kontrolJson(f1.filename):
+            title = "MS-DAF - MS Tespiti"
+            cap = "MR Görüntüsü Üzerinde Otomatik MS Tespiti"
+            abstract = filename.split('.')[
+                0]+" dosyasının otomatik olarak tespit edilen MS plak(ları) detaylı olarak görülmektedir."
+            return render_template('detectionPre.html', title=title, cap=cap, abstract=abstract, orjFile=filename, predFileName=predFileName)
+
+        else:
+            flash('İzin verilmeyen dosya uzantısı', 'danger')
+            return redirect('msDetection')
+    else:
+        abort(401)
+
+
+@app.route('/msFinderCompare', methods=['POST'])
+def msFinderCompare():
+    if request.method == 'POST':
+        # formdan dosya gelip gelmediğini kontrol edelim
+        if 'fname' not in request.files:
+            flash('Dosya seçilmedi', 'danger')
+            return redirect('msDetection')
+
+            # kullanıcı dosya seçmemiş ve tarayıcı boş isim göndermiş mi
+        f = request.files['fname']
+        if f.filename == '':
+            flash('Dosya seçilmedi', 'danger')
+            return redirect('msDetection')
+
+            # gelen dosyayı güvenlik önlemlerinden geçir
+        if f and uzanti_kontrol(f.filename):
+
+            filename = secure_filename(f.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+            f.save(filepath)
+            flash('Dosya başarıyla yüklendi.', 'success')
+            image = cv2.imread(filepath)
+            results = model.detect([image], verbose=1)
+
+            class_names = ['BG', 'msMask']
+            r = results[0]
+            predFileName = "det_"+filename.split('.')[0]+".jpg"
+            print(predFileName)
+            pred_path = UPLOAD_PRED_PATH+"/"+predFileName
+            class_names = ['BG', 'msPlaque']
+            visualize.save_instances(
+                image, r['rois'], r['masks'], r['class_ids'], class_names,  r['scores'], path=pred_path)
+            flash("Tespit edilen lezyon adedi: " +
+                  str(len(r['class_ids'])), 'light')
+
+            fJson = request.files['jsonfname']
+            if fJson and uzanti_kontrolJson(fJson.filename):
                 jsonFile = str(uuid.uuid4())+".json"
                 filenameJ = secure_filename(jsonFile)
                 filepathJ = os.path.join(
                     app.config['UPLOAD_FOLDER'], filenameJ)
-                f1.save(filepathJ)
+                fJson.save(filepathJ)
 
                 dataset = configFile.MsMaskDataset()
                 dataset.sload_msMask(app.config['UPLOAD_FOLDER'], filepathJ)
@@ -375,17 +525,22 @@ def msDetec():
                     flash("DC:{:.2f}, JC:{:.2f}, VOE:{:.2f}, IOU:{:.2f} ".format(
                         dc, jc, voe, iou), "light")
 
-                title = "MS Detection with GT"
-                cap = "MS Detection with GT- Test"
-                return render_template('detectionPre2.html', title=title, cap=cap+" PRE "+filename,
-                                       MSDetecFile=predFileName, GTMatchFile=GTMatchFile,
-                                       GTFileName=GTFileName, orjFile=filename)
+                title = "MS-DAF - Karşılaştırmalı MS Tespiti"
+                cap = "MR Görüntüsü Üzerinde Otomatik MS Tespiti ve Uzman Hekim Seçimleri ile karşılaştırması"
+                abstract = filename.split('.')[
+                    0]+" dosyasının otomatik olarak tespit edilen MS plak(ları) detaylı olarak görülmektedir."
+                return render_template('detectionPre.html', title=title, cap=cap, abstract=abstract,
+                                       orjFile=filename,   predFileName=predFileName,
+                                       GTOverFileName=GTMatchFile,  GTFileName=GTFileName)
+
             else:
                 flash("Ground Truth file not exist or wrong", "danger")
 
-            title = "MS Detection"
-            cap = "MS Detection - Test"
-            return render_template('detectionPre.html', title=title, cap=cap+" PRE "+filename, filename=predFileName)
+            title = "MS-DAF - MS Tespiti"
+            cap = "MR Görüntüsü Üzerinde Otomatik MS Tespiti"
+            abstract = filename.split('.')[
+                0]+" dosyasının otomatik olarak tespit edilen MS plak(ları) detaylı olarak görülmektedir. Uzman Hekim seçimlerini yüklemediğiniz için bu bölümden devam edilmiştir. "
+            return render_template('detectionPre.html', title=title, cap=cap, abstract=abstract, orjFile=filename, predFileName=predFileName)
 
         else:
             flash('İzin verilmeyen dosya uzantısı', 'danger')
@@ -394,55 +549,126 @@ def msDetec():
         abort(401)
 
 
-@app.route('/msShowFollowUp')
-def msShowFollowUp():
-    title = "MS FollowUp "
-    cap = "MS FollowUp - Test"
-    return render_template('followup.html', title=title, cap=cap)
-
-@app.route('/FollowUp')
-def FollowUp():
-    title = "MS FollowUp "
-    cap = "MS FollowUp - Test"
-    return render_template('followup.html', title=title, cap=cap)
-
-
-@app.route('/msFollowUpCompare')
-def msFollowUpCompare():
-    title = "MS FollowUp "
-    cap = "MS FollowUp - Test"
-    return render_template('followup.html', title=title, cap=cap)
-
-
-@app.route('/msFollowUp', methods=['POST'])
-def msFollowUp():
+@app.route('/msFollowUpShow', methods=['POST'])
+def msFollowUpShow():
     if request.method == 'POST':
         # formdan dosya gelip gelmediğini kontrol edelim
         if ('firstMR' and 'secondMR') not in request.files:
             flash('Dosya seçilmedi', 'danger')
-            return redirect('followup')
+            return redirect('msFollowUp')
 
-        f1 = request.files['firstMR']
-        f2 = request.files['secondMR']
+        f0 = request.files['firstMR']
+        f1 = request.files['secondMR']
+        fJson = request.files['jsonfname']
 
-        if f1.filename == '' or f2.filename == '':
+        if f0.filename == '' or f1.filename == '' or fJson.filename == '':
             flash('Dosya seçilmedi', 'danger')
-            return redirect('followup')
+            return redirect('msFollowUp')
 
-        if((f1 and uzanti_kontrol(f1.filename)) and (f2 and uzanti_kontrol(f2.filename))) != True:
+        if((f0 and uzanti_kontrol(f0.filename)) and (f1 and uzanti_kontrol(f1.filename)) and (fJson and uzanti_kontrolJson(fJson.filename))) != True:
             flash('Dosya tipinde hata var. ', 'danger')
-            return redirect('followup')
+            return redirect('msFollowUp')
         else:
+            filename0 = secure_filename(f0.filename)
             filename1 = secure_filename(f1.filename)
-            filename2 = secure_filename(f2.filename)
+
+            filepath0 = os.path.join(app.config['UPLOAD_FOLDER'], filename0)
+            f0.save(filepath0)
+            # flash('ilk MR görüntüsü başarıyla yüklendi.', 'success')
 
             filepath1 = os.path.join(app.config['UPLOAD_FOLDER'], filename1)
             f1.save(filepath1)
+            # flash('ikinci MR görüntüsü başarıyla yüklendi.', 'success')
+            # flash('Dosyalar başarıyla yüklendi.', 'success')
+            jsonFile = str(uuid.uuid4())+".json"
+            filenameJ = secure_filename(jsonFile)
+            filepathJ = os.path.join(app.config['UPLOAD_FOLDER'], filenameJ)
+            fJson.save(filepathJ)
+            dataset = configFile.MsMaskDataset()
+            print("Json:", filepathJ)
+            dataset.sload_msMask(app.config['UPLOAD_FOLDER'], filepathJ)
+            dataset.prepare()
+            info = dataset.image_info[0]
+            sifir = 0
+            bir = 1
+            if(info["id"] != f0.filename):
+                bir = 0
+                sifir = 1
+
+            image0, image_meta0, gt_class_id0, gt_bbox0, gt_mask0 =\
+                modellib.load_image_gt(
+                    dataset, config, sifir, use_mini_mask=False)
+
+            GTFileName0 = "GT_"+filename0.split('.')[0]+".jpg"
+            GTFilePath0 = UPLOAD_PRED_PATH+"/"+GTFileName0
+
+            image1, image_meta1, gt_class_id1, gt_bbox1, gt_mask1 =\
+                modellib.load_image_gt(
+                    dataset, config, bir, use_mini_mask=False)
+
+            GTFileName1 = "GT_"+filename1.split('.')[0]+".jpg"
+            GTFilePath1 = UPLOAD_PRED_PATH+"/"+GTFileName1
+
+            # class_names = ['BG', 'msMask']
+
+            message, colorsR0, colorsR1, ratesR0, ratesR1, classIDs0, classIDs1 = compareM(
+                gt_mask0, gt_mask1)
+
+            print(ratesR0, ratesR1, classIDs0, classIDs1)
+
+            class_names = ['old', 'smaller', 'bigger', 'same', 'new']
+
+            visualize.save_instances(
+                image0, gt_bbox0, gt_mask0, classIDs0, class_names, ratesR0,
+                path=GTFilePath0, colors=colorsR0)
+            visualize.save_instances(
+                image1, gt_bbox1, gt_mask1, classIDs1, class_names, ratesR1,
+                path=GTFilePath1, colors=colorsR1)
+
+            title = "Follow-Up"
+            cap = "Follow-Up Görüntüleme"
+            abstract = "Yükelenen dosyaların uzman hekim görüşleri ile \
+                        belirtilen plak(ları) ve bu plakların değişimleri aşağıda detaylı olarak görülmektedir."
+
+            return render_template('followupPre.html', title=title, cap=cap, abstract=abstract,
+                                   orjfile0=filename0, orjfile1=filename1,
+                                   GTFileName0=GTFileName0, GTFileName1=GTFileName1
+                                   )
+    else:
+        flash("bir hata oluştu", "danger")
+        return redirect('msFollowUpmsFollowUp')
+
+
+@app.route('/msFollowUpFinder', methods=['POST'])
+def msFollowUpFinder():
+    if request.method == 'POST':
+        # formdan dosya gelip gelmediğini kontrol edelim
+        if ('firstMR' and 'secondMR') not in request.files:
+            flash('Dosya seçilmedi', 'danger')
+            return redirect('msOtoFollowUp')
+
+        f0 = request.files['firstMR']
+        f1 = request.files['secondMR']
+
+        if f0.filename == '' or f1.filename == '':
+            flash('Dosya seçilmedi', 'danger')
+            return redirect('msOtoFollowUp')
+
+        if((f0 and uzanti_kontrol(f0.filename)) and (f1 and uzanti_kontrol(f1.filename))) != True:
+            flash('Dosya tipinde hata var. ', 'danger')
+            return redirect('msOtoFollowUp')
+        else:
+            filename0 = secure_filename(f0.filename)
+            filename1 = secure_filename(f1.filename)
+
+            filepath0 = os.path.join(app.config['UPLOAD_FOLDER'], filename0)
+            f0.save(filepath0)
             # flash('ilk MR görüntüsü başarıyla yüklendi.', 'success')
 
-            filepath2 = os.path.join(app.config['UPLOAD_FOLDER'], filename2)
-            f2.save(filepath2)
+            filepath1 = os.path.join(app.config['UPLOAD_FOLDER'], filename1)
+            f1.save(filepath1)
             # flash('ikinci MR görüntüsü başarıyla yüklendi.', 'success')
+            # flash('Dosyalar başarıyla yüklendi.', 'success')
 
             class_names = ['BG', 'msMask']
 
@@ -452,35 +678,217 @@ def msFollowUp():
             predFileName1 = "pre_"+filename1.split('.')[0]+".jpg"
             pred_path1 = UPLOAD_PRED_PATH+"/"+predFileName1
 
-            image2 = cv2.imread(filepath2)
-            results2 = model.detect([image2], verbose=1)
-            r2 = results2[0]
-            predFileName2 = "pre_"+filename2.split('.')[0]+".jpg"
-            pred_path2 = UPLOAD_PRED_PATH+"/"+predFileName2
+            image0 = cv2.imread(filepath0)
+            results0 = model.detect([image0], verbose=1)
+            r0 = results0[0]
+            predFileName0 = "pre_"+filename0.split('.')[0]+".jpg"
+            pred_path0 = UPLOAD_PRED_PATH+"/"+predFileName0
 
-            message, colorsR1, colorsR2, ratesR1, ratesR2, classIDs1, classIDs2 = compareMasks(
-                r1, r2)
+            message, colorsR0, colorsR1, ratesR0, ratesR1, classIDs0, classIDs1 = compareMasks(
+                r0, r1)
 
-            print(ratesR1, ratesR2, classIDs1, classIDs2)
+            print(ratesR0, ratesR1, classIDs0, classIDs1)
 
             class_names = ['old', 'smaller', 'bigger', 'same', 'new']
 
             visualize.save_instances(
+                image0, r0['rois'], r0['masks'], classIDs0, class_names,  ratesR0,
+                path=pred_path0, colors=colorsR0)
+            visualize.save_instances(
                 image1, r1['rois'], r1['masks'], classIDs1, class_names, ratesR1,
                 path=pred_path1, colors=colorsR1)
 
+            title = "Otomatik Follow-Up"
+            cap = "Otomatik Follow-Up"
+            abstract = "Yükelenen dosyaların uzman hekim görüşleri ile \
+                        belirtilen plak(ları) ve bu plakların değişimlerinin otomatik tespiti\
+                        aşağıda detaylı olarak görülmektedir."
+
+            return render_template('followupPre.html', title=title, cap=cap, abstract=abstract,
+                                   orjFile0=filename0, orjFile1=filename1,
+                                   predFileName0=predFileName0, predFileName1=predFileName1
+                                   )
+    else:
+        flash("bir hata oluştu","danger")
+        return redirect('msOtoFollowUp')
+
+
+@app.route('/msFollowUpCompareShow', methods=['POST'])
+def msFollowUpCompareShow():
+    if request.method == 'POST':
+        # formdan dosya gelip gelmediğini kontrol edelim
+        if ('firstMR' and 'secondMR') not in request.files:
+            flash('Dosya seçilmedi', 'danger')
+            return redirect('msFollowUpCompare')
+
+        f0 = request.files['firstMR']
+        f1 = request.files['secondMR']
+        fJson = request.files['jsonfname']
+
+        if f0.filename == '' or f1.filename == '' or fJson.filename=='':
+            flash('Dosya seçilmedi', 'danger')
+            return redirect('msFollowUpCompare')
+
+        if((f0 and uzanti_kontrol(f0.filename)) and (f1 and uzanti_kontrol(f1.filename)) and (fJson and uzanti_kontrolJson(fJson.filename))) != True:
+            flash('Dosya tipinde hata var. ', 'danger')
+            return redirect('msFollowUpCompare')
+        else:
+            filename0 = secure_filename(f0.filename)
+            filename1 = secure_filename(f1.filename)
+
+            filepath0 = os.path.join(app.config['UPLOAD_FOLDER'], filename0)
+            f0.save(filepath0)
+            # flash('ilk MR görüntüsü başarıyla yüklendi.', 'success')
+
+            filepath1 = os.path.join(app.config['UPLOAD_FOLDER'], filename1)
+            f1.save(filepath1)
+            # flash('ikinci MR görüntüsü başarıyla yüklendi.', 'success')
+            # flash('Dosyalar başarıyla yüklendi.', 'success')
+
+            class_names = ['BG', 'msMask']
+
+            image1 = cv2.imread(filepath1)
+            results1 = model.detect([image1], verbose=1)
+            r1 = results1[0]
+            predFileName1 = "pre_"+filename1.split('.')[0]+".jpg"
+            pred_path1 = UPLOAD_PRED_PATH+"/"+predFileName1
+
+            image0 = cv2.imread(filepath0)
+            results0 = model.detect([image0], verbose=1)
+            r0 = results0[0]
+            predFileName0 = "pre_"+filename0.split('.')[0]+".jpg"
+            pred_path0 = UPLOAD_PRED_PATH+"/"+predFileName0
+
+            message, colorsR0, colorsR1, ratesR0, ratesR1, classIDs0, classIDs1 = compareMasks(
+                r0, r1)
+
+            print(ratesR0, ratesR1, classIDs0, classIDs1)
+
+            class_names = ['old', 'smaller', 'bigger', 'same', 'new']
+
             visualize.save_instances(
-                image2, r2['rois'], r2['masks'], classIDs2, class_names,  ratesR2,
-                path=pred_path2, colors=colorsR2)
-            # flash(compareResult, 'warning')
-            # print(r1['masks'].shape)
-            # print(r2['masks'].shape)
+                image0, r0['rois'], r0['masks'], classIDs0, class_names,  ratesR0,
+                path=pred_path0, colors=colorsR0)
+            visualize.save_instances(
+                image1, r1['rois'], r1['masks'], classIDs1, class_names, ratesR1,
+                path=pred_path1, colors=colorsR1)
+            if fJson and uzanti_kontrolJson(fJson.filename):
+                jsonFile = str(uuid.uuid4())+".json"
+                filenameJ = secure_filename(jsonFile)
+                filepathJ = os.path.join(
+                    app.config['UPLOAD_FOLDER'], filenameJ)
+                fJson.save(filepathJ)
+                dataset = configFile.MsMaskDataset()
+                print("Json:", filepathJ)
+                dataset.sload_msMask(app.config['UPLOAD_FOLDER'], filepathJ)
+                dataset.prepare()
+                info = dataset.image_info[0]
+                sifir = 0
+                bir = 1
+                if(info["id"] != f0.filename):
+                    bir = 0
+                    sifir = 1
 
-    title = "Follow-Up Pre"
-    cap = "Follow-Up Preview - Test"
+                image0, image_meta0, gt_class_id0, gt_bbox0, gt_mask0 =\
+                    modellib.load_image_gt(
+                        dataset, config, sifir, use_mini_mask=False)
 
-    return render_template('followupPre.html', title=title, cap=cap, orgFilename1=filename1, orgFilename2=filename2, filename1=predFileName1, filename2=predFileName2)
+                GTFileName0 = "GT_"+filename0.split('.')[0]+".jpg"
+                GTFilePath0 = UPLOAD_PRED_PATH+"/"+GTFileName0
 
+                image1, image_meta1, gt_class_id1, gt_bbox1, gt_mask1 =\
+                    modellib.load_image_gt(
+                        dataset, config, bir, use_mini_mask=False)
+
+                GTFileName1 = "GT_"+filename1.split('.')[0]+".jpg"
+                GTFilePath1 = UPLOAD_PRED_PATH+"/"+GTFileName1
+
+                # class_names = ['BG', 'msMask']
+                flash("!!Uzman görüşlerinden alınan sonuclar!! ==> ","light")
+
+                message, colorsR0, colorsR1, ratesR0, ratesR1, classIDs0, classIDs1 = compareM(
+                    gt_mask0, gt_mask1)
+
+                print(ratesR0, ratesR1, classIDs0, classIDs1)
+
+                class_names = ['old', 'smaller', 'bigger', 'same', 'new']
+
+                visualize.save_instances(
+                    image0, gt_bbox0, gt_mask0, classIDs0, class_names, ratesR0,
+                    path=GTFilePath0, colors=colorsR0)
+                visualize.save_instances(
+                    image1, gt_bbox1, gt_mask1, classIDs1, class_names, ratesR1,
+                    path=GTFilePath1, colors=colorsR1)
+                
+                GTMatchFile0 = "GT_over_"+filename0.split('.')[0]+".jpg"
+                GTMatchPath0 = UPLOAD_PRED_PATH+"/"+GTMatchFile0
+                visualize.save_differences(image0, gt_bbox0, gt_class_id0, gt_mask0,
+                                           r0['rois'], r0['class_ids'], r0['scores'], r0['masks'],
+                                           dataset.class_names, path=GTMatchPath0,
+                                           show_box=False
+                                           )
+                result = maskCompound(r0['masks'])
+                reference = maskCompound(gt_mask0)
+
+                dc = metreE.dc(result, reference)
+                jc = metreE.jc(result, reference)
+                iouX = utils.compute_overlaps_masks(result, reference)
+                iou = iouX[0][0]
+                print()
+                voe = 1-iou
+                vol = np.count_nonzero(result)
+                if not(vol == 0):
+                    asd = metreE.asd(result, reference)
+                    assd = metreE.assd(result, reference)
+                    flash("First MRI: DC:{:.2f}, JC:{:.2f}, VOE:{:.2f}, IOU:{:.2f}, ASD:{:.2f}, ASSD:{:.2f} ".format(
+                        dc, jc, voe, iou, asd, assd), "light")
+                else:
+                    flash("First MRI: DC:{:.2f}, JC:{:.2f}, VOE:{:.2f}, IOU:{:.2f} ".format(
+                        dc, jc, voe, iou), "light")
+
+                GTMatchFile1 = "GT_over_"+filename1.split('.')[0]+".jpg"
+                GTMatchPath1 = UPLOAD_PRED_PATH+"/"+GTMatchFile1
+                visualize.save_differences(image1, gt_bbox1, gt_class_id1, gt_mask1,
+                                           r1['rois'], r1['class_ids'], r1['scores'], r1['masks'],
+                                           dataset.class_names, path=GTMatchPath1,
+                                           show_box=False
+                                           )
+                result = maskCompound(r1['masks'])
+                reference = maskCompound(gt_mask1)
+
+                dc = metreE.dc(result, reference)
+                jc = metreE.jc(result, reference)
+                iouX = utils.compute_overlaps_masks(result, reference)
+                iou = iouX[0][0]
+                print()
+                voe = 1-iou
+                vol = np.count_nonzero(result)
+                if not(vol == 0):
+                    asd = metreE.asd(result, reference)
+                    assd = metreE.assd(result, reference)
+                    flash("Second MRI: DC:{:.2f}, JC:{:.2f}, VOE:{:.2f}, IOU:{:.2f}, ASD:{:.2f}, ASSD:{:.2f} ".format(
+                        dc, jc, voe, iou, asd, assd), "light")
+                else:
+                    flash("Second MRI: DC:{:.2f}, JC:{:.2f}, VOE:{:.2f}, IOU:{:.2f} ".format(
+                        dc, jc, voe, iou), "light")
+                
+            
+
+            title = "Karşılaştırmalı Otomatik Follow-Up "
+            cap = "Karşılaştırmalı Otomatik Follow-Up"
+            abstract = "Yükelenen dosyaların uzman hekim görüşleri ile belirtilen plak(ları)\
+                        sistemin otomatik tespit ettiği plak(lar) ve bu plakların değişimlerinin otomatik tespiti\
+                        ,  aşağıda detaylı olarak görülmektedir."
+
+            return render_template('followupPre.html', title=title, cap=cap, abstract=abstract,
+                                   orjFile0=filename0, orjFile1=filename1,
+                                   predFileName0=predFileName0, predFileName1=predFileName1,
+                                   GTFileName0=GTFileName0, GTFileName1=GTFileName1,
+                                   GTOverFileName0=GTMatchFile0, GTOverFileName1=GTMatchFile1
+                                   )
+    else:
+        flash("bir hata oluştu","danger")
+        return redirect('msFollowUpCompare')
 
 @app.route('/about')
 def about():

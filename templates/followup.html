@@ -17,17 +17,12 @@
 <main id="main">
     <section id="followup" class="followup">
         <div class="container">
-
-            {% with messages= get_flashed_messages(with_categories=true)%}
-            {% if messages%}
-            {% for category,message in messages %}
-            <div class="alert alert-{{category}}" role="alert">{{ message }}</div>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
-
-            <form action="{{url_for('msFollowUp')}}" method="post" enctype="multipart/form-data" id="baseForm"
-                name="baseForm">
+            <div id="row mx-auto">
+                <div id="col-md-4">
+                    <a href="{{url_for('static',filename='testSet1.zip')}}">Örnek Test Set</a>
+                </div>
+            </div>
+            <form action="{{fx}}" method="post" enctype="multipart/form-data" id="baseForm" name="baseForm">
                 <div class="row py-4">
                     <div class="col-md-6 mx-auto">
                         <!-- Upload image input-->
@@ -43,44 +38,47 @@
                         <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
                             <input id="upload2" type="file"
                                 onchange="showFileName(this,'upload2-label','Second MRI : ');readURL2(this);"
-                                class="form-control-lg border-0" name="secondMR">
+                                class="form-control-lg border-0" name="secondMR" required>
                             <label id="upload2-label" for="upload2" class="font-weight-light text-muted">Choose second
                                 MRI slice</label>
 
                         </div>
                     </div>
-
-                    <div class="input-group-append mb-3 px-5 py-2 mx-auto rounded-pill bg-success shadow-sm">
-                        <input type="submit" onclick="checkFiles()"
-                            class=" form-control-lg btn btn-success rounded-pill px-4 w-100 justify-content-center" value="Find Change">
-                    </div>
-
-                    <div class="col-md-6 mx-auto">
-                        <!-- Uploaded image area-->
-                        <p class="font-italic text-black-50 text-center mt-4">First MR slice</p>
-                        <div class="image-area mt-2"><img id="imageResult" src="#" alt=""
-                                class="img-fluid rounded shadow-sm mx-auto d-block">
+                    {%if json1%}
+                    <div class=" col-md-12 mx-auto ">
+                        <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
+                            <input id="uploadJson" type="file"
+                                onchange="showFileName(this,'uploadJson-label','Json File : ');"
+                                class="form-control-lg border-0" name="jsonfname" required>
+                            <label id="uploadJson-label" for="uploadJson" class="font-weight-light text-muted">
+                                Select a Grount-Trouth File (coco style) </label>
                         </div>
                     </div>
-                    <div class="col-md-6 mx-auto">
-                        <p class="font-italic text-black-50 text-center mt-4">Second MR slice</p>
-                        <div class="image-area mt-2"><img id="imageResult2" src="#" alt=""
-                                class="img-fluid rounded shadow-sm mx-auto d-block">
+                    {%endif%}
+                    <div class=" col-md-12 mx-auto ">
+                        <div class="input-group mb-3 px-2 py-2 rounded-pill bg-success shadow-sm">
+                            <input type="submit" onclick="checkFiles()"
+                                class=" form-control-lg btn btn-success rounded-pill px-4 w-100 justify-content-center"
+                                value="Let's Follow-Up">
                         </div>
                     </div>
                 </div>
             </form>
-
-
-
-            {% if filename %}
-
-            <p class="font-italic text-white text-center">Yapılan inceleme sonucunda tespit edilen lezyonların görünüşü
-            </p>
-            <div class="image-area mt-4"><img id="imageResult" src="{{url_for('detecFile',filename=filename)}}" alt=""
-                    class="img-fluid rounded shadow-sm mx-auto d-block">
+            <div class="row">
+                <div class="col-md-6 mx-auto">
+                    <!-- Uploaded image area-->
+                    <p class="font-italic text-black-50 text-center mt-4">First MR slice</p>
+                    <div class="image-area mt-2"><img id="imageResult" src="#" alt=""
+                            class="img-fluid rounded shadow-sm mx-auto d-block">
+                    </div>
+                </div>
+                <div class="col-md-6 mx-auto">
+                    <p class="font-italic text-black-50 text-center mt-4">Second MR slice</p>
+                    <div class="image-area mt-2"><img id="imageResult2" src="#" alt=""
+                            class="img-fluid rounded shadow-sm mx-auto d-block">
+                    </div>
+                </div>
             </div>
-            {% endif %}
         </div>
     </section>
 </main>
