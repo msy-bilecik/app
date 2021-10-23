@@ -805,7 +805,7 @@ def msFollowUpCompareShow():
                 GTFilePath1 = UPLOAD_PRED_PATH+"/"+GTFileName1
 
                 # class_names = ['BG', 'msMask']
-                flash("Opinion", "light")
+                flash("!!Uzman görüşlerinden alınan sonuclar!! ==> ", "light")
 
                 message, colorsR0, colorsR1, ratesR0, ratesR1, classIDs0, classIDs1 = compareM(
                     gt_mask0, gt_mask1)

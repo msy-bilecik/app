@@ -11,12 +11,12 @@
 
     </div>
 </section><!-- #detection -->
+
 <main id="main" class="container">
     <section id="followup" class="followup">
         {% if abstract %}
         <p class="py-3">Yapılan incelemeler sonucunda; {{abstract}}</p>
         {%endif%}
-
         {% with messages= get_flashed_messages(with_categories=true)%}
         {% if messages%}
         <div class="row py-2">
@@ -49,108 +49,59 @@
                 </div>
             </div>
         </div>
-        <div class="row py-2" id="preDetecAll">
-            {%if predFileName0%}
+        <div class="row py-2">
 
-            <div class="col-md-6" id="predFile0">
+            {%if predFileName%}
+
+            <div class="col-md-6" id="predFile">
                 <p class="font-italic text-black-50 text-center">
                     Otomatik Tespit Edilen MS Plaklarının Görünümü
                 </p>
                 <div class="image-area border-secondary"><img id="imageResult"
-                        src="{{url_for('detecFile',filename=predFileName0)}}" alt=""
+                        src="{{url_for('detecFile',filename=predFileName)}}" alt=""
                         class="img-fluid rounded shadow-sm mx-auto d-block">
                 </div>
             </div>
             {%endif%}
 
-            {%if predFileName1%}
-            <div class="col-md-6" id="predFile1">
-                <p class="font-italic text-black-50 text-center">
-                    Otomatik Tespit Edilen MS Plaklarının Görünümü
-                </p>
-                <div class="image-area border-secondary"><img id="imageResult"
-                        src="{{url_for('detecFile',filename=predFileName1)}}" alt=""
-                        class="img-fluid rounded shadow-sm mx-auto d-block">
-                </div>
-            </div>
-            {%endif%}
-            {%if GTOverFileName0%}
+            {%if GTOverFileName%}
 
-            <div class="col-md-6" id="GTOverFile0">
+            <div class="col-md-6" id="GTOverFile">
                 <p class="font-italic text-black-50 text-center">
                     Otomatik Tespit Edilen Plaklar ile Uzman Hekim Görüşünün Örtüşme Görüntüsü
                 </p>
                 <div class="image-area border-secondary"><img id="imageResult"
-                        src="{{url_for('detecFile',filename=GTOverFileName0)}}" alt=""
+                        src="{{url_for('detecFile',filename=GTOverFileName)}}" alt=""
                         class="img-fluid rounded shadow-sm mx-auto d-block">
                 </div>
             </div>
             {%endif%}
-            {%if GTOverFileName1%}
 
-            <div class="col-md-6" id="GTOverFile1">
-                <p class="font-italic text-black-50 text-center">
-                    Otomatik Tespit Edilen Plaklar ile Uzman Hekim Görüşünün Örtüşme Görüntüsü
-                </p>
-                <div class="image-area border-secondary"><img id="imageResult"
-                        src="{{url_for('detecFile',filename=GTOverFileName1)}}" alt=""
-                        class="img-fluid rounded shadow-sm mx-auto d-block">
-                </div>
-            </div>
-            {%endif%}
-            {%if GTFileName0%}
+            {%if GTFileName%}
 
-            <div class="col-md-6" id="GTFile0">
+            <div class="col-md-6" id="GTFile">
                 <p class="font-italic text-black-50 text-center">
                     Uzman hekimin belirlediği plak alanları
                 </p>
                 <div class="image-area border-secondary"><img id="imageResult"
-                        src="{{url_for('detecFile',filename=GTFileName0)}}" alt=""
+                        src="{{url_for('detecFile',filename=GTFileName)}}" alt=""
                         class="img-fluid rounded shadow-sm mx-auto d-block">
                 </div>
             </div>
             {%endif%}
-            {%if GTFileName1%}
-
-            <div class="col-md-6" id="GTFile1">
-                <p class="font-italic text-black-50 text-center">
-                    Uzman hekimin belirlediği plak alanları
-                </p>
-                <div class="image-area border-secondary"><img id="imageResult"
-                        src="{{url_for('detecFile',filename=GTFileName1)}}" alt=""
-                        class="img-fluid rounded shadow-sm mx-auto d-block">
-                </div>
-            </div>
-            {%endif%}
-            {%if orjFile0%}
-            <div class="col-md-6" id="orjFile0">
+            {%if orjFile%}
+            <div class="col-md-6" id="orjFile">
                 <p class="font-italic text-black-50 text-center">
                     Orjinal MR kesiti
                 </p>
                 <div class="image-area border-secondary"><img id=" imageResult"
-                        src="{{url_for('detecFile',filename=orjFile0)}}" alt=""
+                        src="{{url_for('detecFile',filename=orjFile)}}" alt=""
                         class="img-fluid rounded shadow-sm mx-auto d-block">
                 </div>
             </div>
             {%endif%}
-            {%if orjFile1%}
-            <div class="col-md-6" id="orjFile1">
-                <p class="font-italic text-black-50 text-center">
-                    Orjinal MR kesiti
-                </p>
-                <div class="image-area border-secondary"><img id=" imageResult"
-                        src="{{url_for('detecFile',filename=orjFile1)}}" alt=""
-                        class="img-fluid rounded shadow-sm mx-auto d-block">
-                </div>
-            </div>
-            {%endif%}
-            {% if metrics1 %}
 
-            <p class="py-3">{{metrics}}</p>
-
-            {%endif%}
         </div>
-
     </section>
 </main>
 {% endblock %}

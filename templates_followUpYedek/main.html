@@ -1,0 +1,553 @@
+{% extends 'base.html'%}
+
+{% block title %}
+{{title}}
+{% endblock%}
+
+{% block content%}
+<!-- ======= Hero Section ======= -->
+<section id="hero">
+    <div class="hero-container">
+        <h1>MS-DAF 'a Hoşgeldiniz.</h1>
+        <h2><u>M</u>ultiple <u>S</u>clerosis Hastalarının MR görüntülerinde MS
+            tespitini(<u>D</u>etection) yapan, <br /> ve (<u>A</u>nd) değişim takibi
+            (<u>F</u>ollow-Up) imkanı
+            tanıyan bir web platformu olan sayfamıza hoşgeldiniz. </h2>
+        <a href="#about" class="btn-get-started scrollto">Hadi Başlayalım</a>
+    </div>
+</section><!-- #hero -->
+
+<main id="main">
+
+    <!-- ======= About Us Section ======= -->
+    <section id="about" class="about">
+        <div class="container">
+
+            <div class="section-title">
+                <h2>Multipl Skleroz</h2>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 order-1 order-lg-2 my-auto">
+                    <img src="{{url_for('static',filename='img/about-imgg1.png')}}" class="img-fluid" alt="">
+                </div>
+                <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1">
+                    <h3>MS, beyni ve omuriliği tutan özbağışıklık hastalığıdır.</h3>
+                    <p class="fst-italic">
+                        Bağışıklık sistemindeki (immün sistem) savunma amaçlı gözelerin, nedeni daha anlaşılamamış bir
+                        şekilde,
+                        sinir hücrelerinin (nöronlar) çevresinde bulunan myelin kılıfını (buna bir nevi yağlı bir zar
+                        katmanı
+                        diyebiliriz) vücuda yabancı bir bağıştıran olarak algılamasıyla yok etmeye çalışmasıdır. Bu
+                        durum da,
+                        çeşitli sinir sistemi belirtilerini ortaya çıkarır. Bu belirtiler geçici olup, hastalığın
+                        düzeyine göre iz
+                        bırakabilir ya da bırakmadan ortadan kaybolabilirler.
+                    </p>
+                    <p>
+                        Hastalığın adı iki sözcükten oluşmaktadır:
+                    </p>
+                    <ul>
+                        <li><i class="bi bi-check2-circle"></i> Multipl: Bir ya da daha çok bölgede etkin olup, bir veya
+                            daha çok
+                            belirti (semptom) vermesi. </li>
+                        <li><i class="bi bi-check2-circle"></i> Skleroz: Vücudun savunma gözelerinin myelin kılıfına
+                            saldırması
+                            sonucu, bu kılıfı sertleştirerek işlevsiz duruma
+                            getirmesi.</li>
+                    </ul>
+                    <p>
+                        Bu skleroz sonucunda plak adı verilen doku bozukluğunun oluşması MS'i oluşturur.Hastalığın
+                        etkilediği
+                        kişiler çoğunlukla 20-40 yaş arası erişkinlerdir. Kadınlarda
+                        görülme sıklığı erkeklere oranla iki katıdır. Hastalığın coğrafyası da, ekvatordan kutuplara
+                        doğru
+                        gidildikçe genişler. Daha çok Kuzey Avrupa'da yaygındır. </p>
+                </div>
+            </div>
+
+        </div>
+    </section><!-- End About Us Section -->
+
+    <!-- ======= Services Section ======= -->
+    <section id="services" class="services section-bg">
+        <div class="container">
+
+            <div class="section-title">
+                <h2>Servisler</h2>
+                <p>MS-DAF ile hizmete girecek servislerimiz </p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-4 col-md-6 icon-box ">
+                    <div class="icon"><i class="bi bi-clipboard-check"></i></div>
+                    <h4 class="title">MS Görüntüleme</h4>
+                    <p class="description">MS plaklarını hekimlerin işaretlediği bölgeler üzerinden görüntüleme yapan
+                        servistir.
+                    </p>
+                </div>
+                <div class="col-lg-4 col-md-6 icon-box">
+                    <div class="icon"><i class="bi bi-clipboard-data"></i></div>
+                    <h4 class="title">MS Tespiti</h4>
+                    <p class="description">MS plaklarını derin öğrenme ağı teknikleri ile tespit eden servisdir. </p>
+                </div>
+                <div class="col-lg-4 col-md-6 icon-box">
+                    <div class="icon"><i class="bi bi-file-richtext"></i></div>
+                    <h4 class="title">Otomatik MS Tespiti</h4>
+                    <p class="description">MS plaklarını MRI görüntülerinden tespit eden ve uzman görüşleri ile başarım
+                        hesaplayan servistir. </p>
+                </div>
+                <div class="col-lg-4 col-md-6 icon-box">
+                    <div class="icon"><i class="bi bi-images"></i></div>
+                    <h4 class="title">MS Takibi</h4>
+                    <p class="description">Uzman görüşleriyle işaretlenmiş MS plaklarını farklı periyodlar için
+                        görüntüleyen
+                        ve değişimini hesaplayan servisdir. </p>
+                </div>
+                <div class="col-lg-4 col-md-6 icon-box">
+                    <div class="icon"><i class="bi bi-layers"></i></div>
+                    <h4 class="title">Otomatik MS Takibi</h4>
+                    <p class="description">Farklı iki periyotta alınmış MRi görüntüleri üzerinde MS plaklarının derin
+                        öğrenme
+                        teknikleri ile tespiti ve değişim takibi yapan servisimizdir. </p>
+                </div>
+                <div class="col-lg-4 col-md-6 icon-box">
+                    <div class="icon"><i class="bi bi-list-check"></i></div>
+                    <h4 class="title">Karşılaştırmalı MS Takibi</h4>
+                    <p class="description">Farklı iki periyotta alınmış MRi görüntüleri üzerinde MS plaklarının derin
+                        öğrenme
+                        teknikleri ile tespiti, değişim takibini ve uzman görüşleri ile başarım tespiti yapan
+                        servisimizdir.</p>
+                </div>
+            </div>
+
+        </div>
+    </section><!-- End Services Section -->
+
+    <!-- ======= Call To Action Section ======= -->
+    <section class="call-to-action">
+        <div class="container">
+
+            <div class="text-center">
+                <h3>Değişim Takibi</h3>
+                <p>MS plaklarında değişim takibi hekimler için büyük önem arz etmektedir. Hastaların konforu için MS
+                    plaklarının her MRi çekiminde değişimi ile hastalığın iyileşme veya ilerleme seyrinin tespitinde
+                    yardımcı
+                    olmaktadır. </p>
+                <a class="cta-btn" href="#">MS Takibi</a>
+            </div>
+
+        </div>
+    </section><!-- End Call To Action Section -->
+
+    <!-- ======= Our Portfolio Section ======= -->
+    <section id="portfolio" class="portfolio">
+        <div class="container">
+
+            <div class="section-title">
+                <h2>Örnekler</h2>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul id="portfolio-flters">
+                        <li data-filter="*" class="filter-active">Hepsi</li>
+                        <li data-filter=".filter-app">Uzman Görüşü</li>
+                        <li data-filter=".filter-card">Plak Tespiti</li>
+                        <li data-filter=".filter-web">Örtüşme Örnekleri</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row portfolio-container">
+
+                <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+                    <div class="portfolio-wrap">
+                        <img src="{{url_for('static',filename='img/portfolio/portfolio-2.jpg')}}" class="img-fluid" alt="">
+                        <div class="portfolio-info">
+                            <h3><a href="{{url_for('static',filename='img/portfolio/portfolio-2.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="App 1">App 1</a></h3>
+                            <div>
+                                <a href="{{url_for('static',filename='img/portfolio/portfolio-2.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="App 1"><i class="bi bi-plus"></i></a>
+                                <a href="portfolio-details.html" title="Details"><i class="bi bi-link"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item filter-web">
+                    <div class="portfolio-wrap">
+                        <img src="{{url_for('static',filename='img/portfolio/portfolio-7.jpg')}}" class="img-fluid" alt="">
+                        <div class="portfolio-info">
+                            <h3><a href="{{url_for('static',filename='img/portfolio/portfolio-7.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="Web 3">Web 3</a></h3>
+                            <div>
+                                <a href="{{url_for('static',filename='img/portfolio/portfolio-7.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="Web 3"><i class="bi bi-plus"></i></a>
+                                <a href="portfolio-details.html" title="Details"><i class="bi bi-link"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+                    <div class="portfolio-wrap">
+                        <img src="{{url_for('static',filename='img/portfolio/portfolio-5.jpg')}}" class="img-fluid" alt="">
+                        <div class="portfolio-info">
+                            <h3><a href="{{url_for('static',filename='img/portfolio/portfolio-5.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="App 2">App 2</a></h3>
+                            <div>
+                                <a href="{{url_for('static',filename='img/portfolio/portfolio-5.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="App 2"><i class="bi bi-plus"></i></a>
+                                <a href="portfolio-details.html" title="Details"><i class="bi bi-link"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item filter-card">
+                    <div class="portfolio-wrap">
+                        <img src="{{url_for('static',filename='img/portfolio/portfolio-10.jpg')}}" class="img-fluid" alt="">
+                        <div class="portfolio-info">
+                            <h3><a href="{{url_for('static',filename='img/portfolio/portfolio-10.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="Card 2">Card 2</a></h3>
+                            <div>
+                                <a href="{{url_for('static',filename='img/portfolio/portfolio-10.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="Card 2"><i class="bi bi-plus"></i></a>
+                                <a href="portfolio-details.html" title="Details"><i class="bi bi-link"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item filter-web">
+                    <div class="portfolio-wrap">
+                        <img src="{{url_for('static',filename='img/portfolio/portfolio-8.jpg')}}" class="img-fluid" alt="">
+                        <div class="portfolio-info">
+                            <h3><a href="{{url_for('static',filename='img/portfolio/portfolio-8.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="Web 2">Web 2</a></h3>
+                            <div>
+                                <a href="{{url_for('static',filename='img/portfolio/portfolio-8.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="Web 2"><i class="bi bi-plus"></i></a>
+                                <a href="portfolio-details.html" title="Details"><i class="bi bi-link"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+                    <div class="portfolio-wrap">
+                        <img src="{{url_for('static',filename='img/portfolio/portfolio-4.jpg')}}" class="img-fluid" alt="">
+                        <div class="portfolio-info">
+                            <h3><a href="{{url_for('static',filename='img/portfolio/portfolio-4.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="App 3">App 3</a></h3>
+                            <div>
+                                <a href="{{url_for('static',filename='img/portfolio/portfolio-4.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="App 3"><i class="bi bi-plus"></i></a>
+                                <a href="portfolio-details.html" title="Details"><i class="bi bi-link"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item filter-card">
+                    <div class="portfolio-wrap">
+                        <img src="{{url_for('static',filename='img/portfolio/portfolio-11.jpg')}}" class="img-fluid" alt="">
+                        <div class="portfolio-info">
+                            <h3><a href="{{url_for('static',filename='img/portfolio/portfolio-11.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="Card 1">Card 1</a></h3>
+                            <div>
+                                <a href="{{url_for('static',filename='img/portfolio/portfolio-11.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="Card 1"><i class="bi bi-plus"></i></a>
+                                <a href="portfolio-details.html" title="Details"><i class="bi bi-link"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item filter-card">
+                    <div class="portfolio-wrap">
+                        <img src="{{url_for('static',filename='img/portfolio/portfolio-10.jpg')}}" class="img-fluid" alt="">
+                        <div class="portfolio-info">
+                            <h3><a href="{{url_for('static',filename='img/portfolio/portfolio-10.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="Card 3">Card 3</a></h3>
+                            <div>
+                                <a href="{{url_for('static',filename='img/portfolio/portfolio-10.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="Card 3"><i class="bi bi-plus"></i></a>
+                                <a href="portfolio-details.html" title="Details"><i class="bi bi-link"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 portfolio-item filter-web">
+                    <div class="portfolio-wrap">
+                        <img src="{{url_for('static',filename='img/portfolio/portfolio-7.jpg')}}" class="img-fluid" alt="">
+                        <div class="portfolio-info">
+                            <h3><a href="{{url_for('static',filename='img/portfolio/portfolio-7.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="Web 1">Web 1</a></h3>
+                            <div>
+                                <a href="{{url_for('static',filename='img/portfolio/portfolio-7.jpg')}}" data-gallery="portfolioGallery"
+                                    class="portfolio-lightbox" title="Web 1"><i class="bi bi-plus"></i></a>
+                                <a href="portfolio-details.html" title="Details"><i class="bi bi-link"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section><!-- End Our Portfolio Section -->
+
+    <!-- ======= Frequently Asked Questions Section ======= -->
+    <section id="faq" class="faq section-bg">
+        <div class="container">
+
+            <div class="section-title">
+                <h2>Frequently Asked Questions</h2>
+            </div>
+
+            <ul class="faq-list">
+
+                <li>
+                    <div data-bs-toggle="collapse" class="collapsed question" href="#faq1">Non consectetur a erat nam at
+                        lectus
+                        urna duis? <i class="bi bi-chevron-down icon-show"></i><i
+                            class="bi bi-chevron-up icon-close"></i></div>
+                    <div id="faq1" class="collapse" data-bs-parent=".faq-list">
+                        <p>
+                            Feugiat pretium nibh ipsum consequat. Tempus iaculis urna id volutpat lacus laoreet non
+                            curabitur
+                            gravida. Venenatis lectus magna fringilla urna porttitor rhoncus dolor purus non.
+                        </p>
+                    </div>
+                </li>
+
+                <li>
+                    <div data-bs-toggle="collapse" href="#faq2" class="collapsed question">Feugiat scelerisque varius
+                        morbi enim
+                        nunc faucibus a pellentesque? <i class="bi bi-chevron-down icon-show"></i><i
+                            class="bi bi-chevron-up icon-close"></i></div>
+                    <div id="faq2" class="collapse" data-bs-parent=".faq-list">
+                        <p>
+                            Dolor sit amet consectetur adipiscing elit pellentesque habitant morbi. Id interdum velit
+                            laoreet id
+                            donec ultrices. Fringilla phasellus faucibus scelerisque eleifend donec pretium. Est
+                            pellentesque elit
+                            ullamcorper dignissim. Mauris ultrices eros in cursus turpis massa tincidunt dui.
+                        </p>
+                    </div>
+                </li>
+
+                <li>
+                    <div data-bs-toggle="collapse" href="#faq3" class="collapsed question">Dolor sit amet consectetur
+                        adipiscing
+                        elit pellentesque habitant morbi? <i class="bi bi-chevron-down icon-show"></i><i
+                            class="bi bi-chevron-up icon-close"></i></div>
+                    <div id="faq3" class="collapse" data-bs-parent=".faq-list">
+                        <p>
+                            Eleifend mi in nulla posuere sollicitudin aliquam ultrices sagittis orci. Faucibus pulvinar
+                            elementum
+                            integer enim. Sem nulla pharetra diam sit amet nisl suscipit. Rutrum tellus pellentesque eu
+                            tincidunt.
+                            Lectus urna duis convallis convallis tellus. Urna molestie at elementum eu facilisis sed
+                            odio morbi quis
+                        </p>
+                    </div>
+                </li>
+
+                <li>
+                    <div data-bs-toggle="collapse" href="#faq4" class="collapsed question">Ac odio tempor orci dapibus.
+                        Aliquam
+                        eleifend mi in nulla? <i class="bi bi-chevron-down icon-show"></i><i
+                            class="bi bi-chevron-up icon-close"></i></div>
+                    <div id="faq4" class="collapse" data-bs-parent=".faq-list">
+                        <p>
+                            Dolor sit amet consectetur adipiscing elit pellentesque habitant morbi. Id interdum velit
+                            laoreet id
+                            donec ultrices. Fringilla phasellus faucibus scelerisque eleifend donec pretium. Est
+                            pellentesque elit
+                            ullamcorper dignissim. Mauris ultrices eros in cursus turpis massa tincidunt dui.
+                        </p>
+                    </div>
+                </li>
+
+                <li>
+                    <div data-bs-toggle="collapse" href="#faq5" class="collapsed question">Tempus quam pellentesque nec
+                        nam
+                        aliquam sem et tortor consequat? <i class="bi bi-chevron-down icon-show"></i><i
+                            class="bi bi-chevron-up icon-close"></i></div>
+                    <div id="faq5" class="collapse" data-bs-parent=".faq-list">
+                        <p>
+                            Molestie a iaculis at erat pellentesque adipiscing commodo. Dignissim suspendisse in est
+                            ante in. Nunc
+                            vel risus commodo viverra maecenas accumsan. Sit amet nisl suscipit adipiscing bibendum est.
+                            Purus
+                            gravida quis blandit turpis cursus in
+                        </p>
+                    </div>
+                </li>
+
+                <li>
+                    <div data-bs-toggle="collapse" href="#faq6" class="collapsed question">Tortor vitae purus faucibus
+                        ornare.
+                        Varius vel pharetra vel turpis nunc eget lorem dolor? <i
+                            class="bi bi-chevron-down icon-show"></i><i class="bi bi-chevron-up icon-close"></i></div>
+                    <div id="faq6" class="collapse" data-bs-parent=".faq-list">
+                        <p>
+                            Laoreet sit amet cursus sit amet dictum sit amet justo. Mauris vitae ultricies leo integer
+                            malesuada
+                            nunc vel. Tincidunt eget nullam non nisi est sit amet. Turpis nunc eget lorem dolor sed. Ut
+                            venenatis
+                            tellus in metus vulputate eu scelerisque. Pellentesque diam volutpat commodo sed egestas
+                            egestas
+                            fringilla phasellus faucibus. Nibh tellus molestie nunc non blandit massa enim nec.
+                        </p>
+                    </div>
+                </li>
+
+            </ul>
+
+        </div>
+    </section><!-- End Frequently Asked Questions Section -->
+
+    <!-- ======= Our Team Section ======= -->
+    <section id="team" class="team">
+        <div class="container ">
+
+            <div class="section-title">
+                <h2>Proje Ekibimiz</h2>
+                <p></p>
+            </div>
+
+            <div class="row gy-4 justify-content-center">
+                <div class="col-lg-4 col-md-6">
+                    <div class="member">
+                        <img src="{{url_for('static',filename='img/team/emre1.jpg')}}" alt="">
+                        <h4>Doç. Dr. Emre DANDIL</h4>
+                        <span>Danışman</span>
+                        <p>
+                            Bilecik Şeyh Edebali Üniversitesi, Mühendislik Fakültesi, Bilgisayar Mühendisliği
+                        </p>
+                        <div class="social">
+                            <a href=""><i class="bi bi-twitter"></i></a>
+                            <a href=""><i class="bi bi-facebook"></i></a>
+                            <a href=""><i class="bi bi-instagram"></i></a>
+                            <a href=""><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="member">
+                        <img src="{{url_for('static',filename='img/team/msy1.jpg')}}" alt="">
+                        <h4>Öğr. Gör. Mehmet Süleyman YILDIRIM</h4>
+                        <span>  &nbsp;</span>
+                        <p>
+                            Bilecik Şeyh Edebali Üniversitesi, Söğüt Meslek Yüksekokulu , Bilgisayar Programcılığı
+                        </p>
+                        <div class="social">
+                            <a href=""><i class="bi bi-twitter"></i></a>
+                            <a href=""><i class="bi bi-facebook"></i></a>
+                            <a href=""><i class="bi bi-instagram"></i></a>
+                            <a href=""><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+    </section><!-- End Our Team Section -->
+
+    <!-- ======= Contact Us Section ======= -->
+    <section id="contact" class="contact section-bg">
+        <div class="container">
+
+            <div class="section-title">
+                <h2>İletişim</h2>
+                <p>Projenin gelişiminden haberdar olmak için, önerileriniz veya destekleriniz için bizimle iletişime
+                    geçebilirsiniz. </p>
+            </div>
+
+            <div class="row">
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="contact-about">
+                        <h3>MS-DAF</h3>
+                        <p><u>M</u>ultiple <u>S</u>clerosis Hastalarının MR görüntülerinde MS
+                            tespitini(<u>D</u>etection) yapan, ve (<u>A</u>nd) değişim takibi
+                            (<u>F</u>ollow-Up) imkanı tanıyan bir web platformudur</p>
+                        <div class="social-links">
+                            <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+                            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="info">
+                        <div>
+                            <i class="bi bi-geo-alt"></i>
+                            <p>Mühendislik Fakültesi, <br>Gülümbe Kampüsü, <br>11230 Bilecik, Türkiye</p>
+                        </div>
+
+                        <div>
+                            <i class="bi bi-envelope"></i>
+                            <p>msdaf@bilecike</p>
+                        </div>
+
+                        <div>
+                            <i class="bi bi-phone"></i>
+                            <p>+90 228 214 xxxx</p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-lg-5 col-md-12">
+                    <form action="forms/contact.php" method="post" role="form" class="php-email-form" aria-disabled="true">
+                        <div class="form-group">
+                            <input type="text" name="name" class="form-control" id="name" placeholder="Adınız" required disabled>
+                        </div>
+                        <div class="form-group mt-3">
+                            <input type="email" class="form-control" name="email" id="email"
+                                placeholder="Mail Adresiniz" required disabled>
+                        </div>
+                        <div class="form-group mt-3">
+                            <input type="text" class="form-control" name="subject" id="subject" placeholder="Konu"
+                                required disabled>
+                        </div>
+                        <div class="form-group mt-3">
+                            <textarea class="form-control" name="message" rows="5" placeholder="Mesajınız"
+                                required disabled></textarea>
+                        </div>
+                        <div class="my-3">
+                            <div class="loading">Yükleniyor.</div>
+                            <div class="error-message"></div>
+                            <div class="sent-message">Mesajınız gönderildi. Teşekkür ederiz. </div>
+                        </div>
+                        <div class="text-center"><button type="submit" disabled>Gönder</button></div>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+    </section><!-- End Contact Us Section -->
+
+    <!-- ======= Map Section ======= -->
+    <section class="map">
+        <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1812.2598948512164!2d29.966723009809435!3d40.19024725249289!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cb9ad3c7816b17%3A0xc5e2a23702886c18!2zQmlsZWNpayDDnG5pdmVyc2l0ZXNpIEfDvGzDvG1iZSBZZXJsZcWfa2VzaQ!5e0!3m2!1sen!2sbg!4v1631139043345!5m2!1sen!2sbg"
+            width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    </section><!-- End Map Section -->
+
+</main>
+
+{% endblock%}
