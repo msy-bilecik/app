@@ -14,143 +14,268 @@
 <main id="main" class="container">
     <section id="followup" class="followup">
         {% if abstract %}
-        <p class="py-3">Yapılan incelemeler sonucunda; {{abstract}}</p>
+        <p class="py-3"> {{abstract}}</p>
         {%endif%}
 
-        {% with messages= get_flashed_messages(with_categories=true)%}
-        {% if messages%}
+        {% with messagesX= get_flashed_messages(with_categories=true)%}
+        {% if messagesX%}
         <div class="row py-2">
             {% for category,message in messages %}
             <div class="col-md-4 mx-auto px-3">
                 <p class=" alert alert-{{category}}" role="alert">{{ message }}</p>
             </div>
             {% endfor %}
+
         </div>
         {% endif %}
         {% endwith %}
+
+
+        {% if messages %}
+        <div class="row py-2">
+            <div class="col-md-8 mx-auto px-3  ">
+                <ul class="list-group">
+                    {% for key, value in messages.items() %}
+                    <li class="list-group-item list-group-item-{{value.type}} mb-2">
+                        {{value.message}}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {%endif%}
+
+        <div class="row py-2">
+            {% if messages1%}
+            <div class="col-md-6 mx-auto px-3 ">
+                <h3 class="text-center">Automatic detection messages</h3>
+                <ul class="list-group">
+                    {% for key, value in messages1.items() %}
+                    <li class="list-group-item list-group-item-{{value.type}} mb-2 ">
+                        {{value.message}}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {%endif%}
+
+            {% if messages2 %}
+            <div class="col-md-6 mx-auto px-3 ">
+                <h3 class="text-center">Expert selection messages</h3>
+                <ul class="list-group">
+                    {% for key, value in messages2.items() %}
+                    <li class="list-group-item list-group-item-{{value.type}} mb-2">
+                        {{value.message}}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {%endif%}
+
+        </div>
+
+
+        <div class="row py-2">
+            <!--"%2.2f"|format(value*100)-->
+            {% if olcekler1 %}
+            <div class="col-md-6 mx-auto px-3 ">
+                <h4 class="py-3 text-center">First MRI Detection Scores</h4>
+                <table class="table table-sm w-50 mx-auto table-hover ">
+                    <thead>
+                        <tr>
+                            <th scope="col">Metric</th>
+                            <th scope="col" class="w-25">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, value in olcekler1.items() %}
+                        <tr data-toggle="tooltip" data-placement="bottom" title="{% if olcekMetin[key] %} {{olcekMetin[key]}} {%endif%}">
+                            <th scope="row">{{key}}</th>
+                            <td>{{"%2.2f"|format(value*100)}} </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {%endif%}
+
+            {% if olcekler2 %}
+            <div class="col-md-6 mx-auto px-3">
+                <h4 class="py-3 text-center">Second MRI Detection Scores</h4>
+                <table class="table table-sm w-50 mx-auto table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Metric</th>
+                            <th scope="col" class="w-25">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, value in olcekler2.items() %}
+                        <tr>
+                            <th scope="row">{{key}}</th>
+                            <td>{{"%2.2f"|format(value*100)}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {%endif%}
+        </div>
+
+
+
         <div class="row py-2">
             <div class="btn-toolbar m-2 justify-content-center" role="toolbar">
                 <div class="btn-group btn-group-sm m-2" role="group" aria-label="Orjinal MRI Show / Hide">
                     <button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
-                        onclick="showHide('predFile'); showHide('GTOverFile');showHide('GTFile');showHide('orjFile');">
+                        onclick="showHide('preDetecAll'); showHide('GTOverFileAll');showHide('GTFileAll');showHide('orjFileAll');">
                         Show / Hide All</button>
-                    {%if predFileName%} <button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
-                        onclick="showHide('predFile');">
+                    {%if predFileName0%} <button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
+                        onclick="showHide('preDetecAll');">
                         Show / Hide Prediction MRI</button> {%endif%}
-                    {%if GTOverFileName%} <button type="button" class="btn btn-outline-success  mx-3 p-2 rounded"
-                        onclick="showHide('GTOverFile');">
+                    {%if GTOverFileName0%} <button type="button" class="btn btn-outline-success  mx-3 p-2 rounded"
+                        onclick="showHide('GTOverFileAll');">
                         Show / Hide GT- Prediction Overlaps MRI</button>{%endif%}
-                    {%if GTFileName%}<button type="button" class="btn btn-outline-success  mx-3 p-2 rounded"
-                        onclick="showHide('GTFile');">
+                    {%if GTFileName0%}<button type="button" class="btn btn-outline-success  mx-3 p-2 rounded"
+                        onclick="showHide('GTFileAll');">
                         Show / Hide GT MRI</button>{%endif%}
-                    {%if orjFile%}<button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
-                        onclick="showHide('orjFile');">
+                    {%if orjFile0%}<button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
+                        onclick="showHide('orjFileAll');">
                         Show / Hide Orjinal MRI</button>{%endif%}
                 </div>
             </div>
         </div>
-        <div class="row py-2" id="preDetecAll">
-            {%if predFileName0%}
 
-            <div class="col-md-6" id="predFile0">
-                <p class="font-italic text-black-50 text-center">
-                    Otomatik Tespit Edilen MS Plaklarının Görünümü
-                </p>
-                <div class="image-area border-secondary"><img id="imageResult"
-                        src="{{url_for('detecFile',filename=predFileName0)}}" alt=""
-                        class="img-fluid rounded shadow-sm mx-auto d-block">
+
+        {%if predFileName0%}
+        <div class="card-group" id="preDetecAll">
+            <div class="card p-2 m-2 " id="predFile0">
+                <a href="{{url_for('detecFile',filename=predFileName0)}}" class="glightbox2"
+                    data-glightbox='Bottom; description:Automatically Detected Plaques in First MRI' id="predFile0">
+                    <img id="predFile0_img" src="{{url_for('detecFile',filename=predFileName0)}}" alt=""
+                        class=" card-img-top img-fluid rounded shadow-sm mx-auto d-block ">
+                </a>
+                <div class="card-body">
+                    <h6 class="card-title text-center">
+                        Automatically Detected Plaques in First MRI
+                    </h6>
                 </div>
             </div>
-            {%endif%}
 
-            {%if predFileName1%}
-            <div class="col-md-6" id="predFile1">
-                <p class="font-italic text-black-50 text-center">
-                    Otomatik Tespit Edilen MS Plaklarının Görünümü
-                </p>
-                <div class="image-area border-secondary"><img id="imageResult"
-                        src="{{url_for('detecFile',filename=predFileName1)}}" alt=""
-                        class="img-fluid rounded shadow-sm mx-auto d-block">
+            <div class="card p-2 m-2 " id="predFile1">
+                <a href="{{url_for('detecFile',filename=predFileName1)}}" class="glightbox2"
+                    data-glightbox='Bottom; description:Automatically Detected Plaques in Second MRI' id="predFile1">
+                    <img id="predFile1_img" src="{{url_for('detecFile',filename=predFileName1)}}" alt=""
+                        class="card-img-top  img-fluid rounded shadow-sm mx-auto d-block">
+                </a>
+                <div class="card-body">
+                    <h6 class="card-title  text-center">
+                        Automatically Detected Plaques in Second MRI
+                    </h6>
                 </div>
             </div>
-            {%endif%}
-            {%if GTOverFileName0%}
+        </div>
+        {%endif%}
 
-            <div class="col-md-6" id="GTOverFile0">
-                <p class="font-italic text-black-50 text-center">
-                    Otomatik Tespit Edilen Plaklar ile Uzman Hekim Görüşünün Örtüşme Görüntüsü
-                </p>
-                <div class="image-area border-secondary"><img id="imageResult"
-                        src="{{url_for('detecFile',filename=GTOverFileName0)}}" alt=""
-                        class="img-fluid rounded shadow-sm mx-auto d-block">
+        {%if GTOverFileName0%}
+        <div class="card-group " id="GTOverFileAll">
+            <div class="card p-2 m-2 " id="GTOverFile0">
+                <a href="{{url_for('detecFile',filename=GTOverFileName0)}}" class="glightbox2"
+                    data-glightbox='Bottom; description:Overlap of Automatically Detected and Specialist Physician Selection Plaques in First MRI'
+                    id="GTOverFile0">
+                    <img id="GTOverFile0_img" src="{{url_for('detecFile',filename=GTOverFileName0)}}" alt=""
+                        class="card-img-top img-fluid rounded shadow-sm mx-auto d-block">
+                </a>
+                <div class="card-body">
+                    <h6 class="card-title text-center">
+                        Overlap of Automatically Detected and Specialist Physician Selection Plaques in First MRI
+                    </h6>
                 </div>
             </div>
-            {%endif%}
-            {%if GTOverFileName1%}
 
-            <div class="col-md-6" id="GTOverFile1">
-                <p class="font-italic text-black-50 text-center">
-                    Otomatik Tespit Edilen Plaklar ile Uzman Hekim Görüşünün Örtüşme Görüntüsü
-                </p>
-                <div class="image-area border-secondary"><img id="imageResult"
-                        src="{{url_for('detecFile',filename=GTOverFileName1)}}" alt=""
-                        class="img-fluid rounded shadow-sm mx-auto d-block">
+
+            <div class="card p-2 m-2 " id="GTOverFile1">
+                <a href="{{url_for('detecFile',filename=GTOverFileName1)}}" class="glightbox2"
+                    data-glightbox='Bottom; description:Overlap of Automatically Detected and Specialist Physician Selection Plaques in Second MRI'
+                    id="GTOverFile1">
+                    <img id="GTOverFile1_img" src="{{url_for('detecFile',filename=GTOverFileName1)}}" alt=""
+                        class="card-img-top  img-fluid rounded shadow-sm mx-auto d-block">
+                </a>
+                <div class="card-body">
+                    <h6 class="card-title text-center">
+                        Overlap of Automatically Detected and Specialist Physician Selection Plaques in Second MRI
+                    </h6>
                 </div>
             </div>
-            {%endif%}
-            {%if GTFileName0%}
+        </div>
+        {%endif%}
 
-            <div class="col-md-6" id="GTFile0">
-                <p class="font-italic text-black-50 text-center">
-                    Uzman hekimin belirlediği plak alanları
-                </p>
-                <div class="image-area border-secondary"><img id="imageResult"
-                        src="{{url_for('detecFile',filename=GTFileName0)}}" alt=""
-                        class="img-fluid rounded shadow-sm mx-auto d-block">
+        {%if GTFileName0%}
+        <div class="card-group" id="GTFileAll">
+            <div class="card p-2 m-2 " id="GTFile0">
+                <a href="{{url_for('detecFile',filename=GTFileName0)}}" class="glightbox2"
+                    data-glightbox='Bottom; description:Physician Selection Plaques in First MRI' id="GTFileName0">
+                    <img id="GTFile0_img" src="{{url_for('detecFile',filename=GTFileName0)}}" alt=""
+                        class="card-img-top  img-fluid rounded shadow-sm mx-auto d-block">
+                </a>
+                <div class="card-body">
+                    <p class="card-title text-center">
+                        Physician Selection Plaques in First MRI
+                    </p>
                 </div>
             </div>
-            {%endif%}
-            {%if GTFileName1%}
 
-            <div class="col-md-6" id="GTFile1">
-                <p class="font-italic text-black-50 text-center">
-                    Uzman hekimin belirlediği plak alanları
-                </p>
-                <div class="image-area border-secondary"><img id="imageResult"
-                        src="{{url_for('detecFile',filename=GTFileName1)}}" alt=""
-                        class="img-fluid rounded shadow-sm mx-auto d-block">
+
+            <div class="card p-2 m-2 " id="GTFile1">
+                <a href="{{url_for('detecFile',filename=GTFileName1)}}" class="glightbox2"
+                    data-glightbox='Bottom; description:Physician Selection Plaques in Second MRI' id="GTFileName1">
+                    <img id="GTFile1_img" src="{{url_for('detecFile',filename=GTFileName1)}}" alt=""
+                        class="card-img-top img-fluid rounded shadow-sm mx-auto d-block">
+                </a>
+                <div class="card-body">
+                    <p class="card-title text-center">
+                        Physician Selection Plaques in Second MRI
+                    </p>
                 </div>
             </div>
-            {%endif%}
-            {%if orjFile0%}
-            <div class="col-md-6" id="orjFile0">
-                <p class="font-italic text-black-50 text-center">
-                    Orjinal MR kesiti
-                </p>
-                <div class="image-area border-secondary"><img id=" imageResult"
-                        src="{{url_for('detecFile',filename=orjFile0)}}" alt=""
-                        class="img-fluid rounded shadow-sm mx-auto d-block">
+        </div>
+        {%endif%}
+
+        {%if orjFile0%}
+        <div class="card-group" id="orjFileAll">
+            <div class="card p-2 m-2 " id="orjFile0">
+                <a href="{{url_for('detecFile',filename=orjFile0)}}" class="glightbox2"
+                    data-glightbox='Bottom; description:The First Original MRI Slice' id="orjFile0">
+                    <img id="orjFile0_img" src="{{url_for('detecFile',filename=orjFile0)}}" alt=""
+                        class="card-img-top  img-fluid rounded shadow-sm mx-auto d-block">
+                </a>
+                <div class="card-body">
+                    <p class="card-title text-center">
+                        The First Original MRI Slice
+                    </p>
                 </div>
             </div>
-            {%endif%}
-            {%if orjFile1%}
-            <div class="col-md-6" id="orjFile1">
-                <p class="font-italic text-black-50 text-center">
-                    Orjinal MR kesiti
-                </p>
-                <div class="image-area border-secondary"><img id=" imageResult"
-                        src="{{url_for('detecFile',filename=orjFile1)}}" alt=""
-                        class="img-fluid rounded shadow-sm mx-auto d-block">
+
+            <div class="card p-2 m-2 " id="orjFile1">
+                <a href="{{url_for('detecFile',filename=orjFile1)}}" class="glightbox2"
+                    data-glightbox='Bottom; description:The Second Original MRI Slice' id="orjFile1">
+                    <img id="orjFile1_img" src="{{url_for('detecFile',filename=orjFile1)}}" alt=""
+                        class="card-img-top  img-fluid rounded shadow-sm mx-auto d-block">
+                </a>
+                <div class="card-body">
+                    <p class="card-title text-center">
+                        The Second Original MRI Slice
+                    </p>
                 </div>
             </div>
-            {%endif%}
-            {% if metrics1 %}
+        </div>
+        {%endif%}
 
-            <p class="py-3">{{metrics}}</p>
 
-            {%endif%}
         </div>
 
     </section>
 </main>
+
+
 {% endblock %}

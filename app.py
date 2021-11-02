@@ -1,33 +1,21 @@
 # Importing flask module in the project is mandatory
 # An object of Flask class is our WSGI application.
-from mrcnn.model import log
+
 import mrcnn.model as modellib
-from mrcnn.visualize import display_images
 from mrcnn import visualize
 from mrcnn import utils
 import configFile
 from py import metricQc
 from py import metreE
-from py import util
-from keras.preprocessing import image
-from keras.models import load_model
-from tensorflow import keras
 from flask import Flask, redirect, url_for, request, render_template, Response, jsonify, redirect, flash, abort
 from werkzeug.utils import secure_filename
 from gevent.pywsgi import WSGIServer
 import numpy as np
-import pandas as pd
 import uuid
-from skimage.metrics import structural_similarity as ssim
-
 
 import os
-import sys
-import io
 import cv2
 
-import matplotlib.pyplot as plt
-from PIL import Image
 import tensorflow as tf
 print(tf.__version__)
 
@@ -88,13 +76,20 @@ app.secret_key = "msy"
 FILETYPES = set(['png', 'jpg', 'jpeg'])
 ColorSet = [(1.0, 1.0, 0.0), (0.5, 1.0, 0.0),  (1.0, 0.0, 0.0),
             (0.0, 0.5, 1.0), (1, 1, 1)]
-
+olcekMetin = {}
+olcekMetin["DC"] = "DC is a criterion calculated according to the overlap amount of the region placed on the pre-selected regions"
+olcekMetin["JC"] = "JC Similarity"
+olcekMetin["IOU"] = "IOU Similarity"
+olcekMetin["VOE"] = "The VOE metric shows the error rate between the expert opinion and the masked region"
+olcekMetin["ASD"] = "ASD Similarity"
+olcekMetin["ASSD"] = "ASSD Similarity"
+olcekMetin["LTPR"] = "LTPR"
+olcekMetin["LFPR"] = "LFPR"
 # (1.0, 1.0, 0.0) sarı
 # (0.5, 1.0, 0.0) yeşil
 # (1.0, 0.0, 0.0) kırmızı
 # (0.0, 0.5, 1.0) mavi
 # (0.25, 0.25, 0.25) gri
-
 
 
 def uzanti_kontrol(dosyaadi):
@@ -132,9 +127,9 @@ def compareMasks(r1, r2):
 
 
 def compareM(masks1, masks2):
+    messagesX = {}
     if(masks1.shape[0] == masks2.shape[0] and masks1.shape[1] == masks2.shape[1]):
 
-        message = ""
         ix = masks1.shape[2]
         iy = masks2.shape[2]
         zN = np.zeros(iy).astype(int)+4
@@ -171,7 +166,9 @@ def compareM(masks1, masks2):
                         rate = (1 - bMatrix[i, t])*100
                         ratesR1[i] = rate
                         ratesR2[t] = rate
-                        #flash(" 1 plak  %{:.2f} küçülmüştür. ".format(rate), "success")
+                        messagesX["kuculmus"+str(tinyC)] = {
+                            "message": "1 plaque is %{: .2f} smaller than before. ".format(rate), "type": "success"}
+                        # flash(" 1 plak  %{:.2f} küçülmüştür. ".format(rate), "success")
                     elif (bMatrix[i, t] >= 1.02):
                         bigC = bigC+1
                         zN[t] = 2
@@ -179,7 +176,9 @@ def compareM(masks1, masks2):
                         rate = (bMatrix[i, t] - 1)*100
                         ratesR1[i] = rate
                         ratesR2[t] = rate
-                        #flash(" 1 plakda %{:.2f} büyüme gözlenmiştir. ".format(rate), "danger")
+                        messagesX["buyumus"+str(bigC)] = {
+                            "message": " 1 plaque is %{:.2f} larger than before.".format(rate), "type": "danger"}
+                        # flash(" 1 plakda %{:.2f} büyüme gözlenmiştir. ".format(rate), "danger")
 
                 cMatrix[i, t] = simScore
                 t = t+1
@@ -210,36 +209,46 @@ def compareM(masks1, masks2):
                 ratesR2[i] = 0
 
         if(likeC == 0 and bigC == 0 and tinyC == 0):
-            message = "değerlendirme için yeterli benzerlik bulunamadı. "
+            messagesX["notEvulate"] = {
+                "message": "Not enough similarity found for evaluation.", "type": "info"}
            # flash("değerlendirme için yeterli benzerlik bulunamadı. ", "info")
         elif(likeC == iy and likeC == ix):
-            message = "lezyonlarda değişim olmamıştır."
+            messagesX["degismemis"] = {
+                "message": "There is no change in the plaque(s).", "type": "success"}
            # flash("lezyonlarda değişim olmamıştır.", "success")
         else:
             if(likeC > 0):
-                message = message + \
-                    "{:.0f} plakda değişim olmamıştır.".format(likeC)
+                messagesX["benzerSayisi"] = {
+                    "message": "There was no change in {:.0f} plaque(s).".format(likeC), "type": "info"}
             #    flash("{:.0f} plakda değişim olmamıştır.".format(likeC), "info")
             if(tinyC > 0):
-                message = message + " {:.0f} plak küçülmüştür.".format(tinyC)
+                #message = " {:.0f} plak küçülmüştür.".format(tinyC)
+                messagesX["kuculensayisi"] = {
+                    "message": " {:.0f} plaque(s) smaller than before.".format(tinyC), "type": "success"}
             if(bigC > 0):
-                message = message + \
-                    " {:.0f} plakda büyüme gözlenmiştir.".format(bigC)
+              #  message = message +  " {:.0f} plakda büyüme gözlenmiştir.".format(bigC)
+                messagesX["buyuyenSayisi"] = {
+                    "message": " {:.0f} plaque(s) bigger than before.".format(bigC), "type": "danger"}
+
             if(exC > 0):
-                message = message + \
-                    " {: .0f} plak gözlenmemiştir.".format(exC)
+               # message = message + \  " {: .0f} plak gözlenmemiştir.".format(exC)
+                messagesX["yokOlan"] = {
+                    "message": " {: .0f} plaque(s) not observed".format(exC), "type": "warning"}
              #   flash(" {: .0f} plak gözlenmemiştir.".format(exC), "warning")
             if(newC > 0):
-                message = message + \
-                    " {: .0f} yeni plak tespit edilmiştir.".format(newC)
+               # message = message + \                    " {: .0f} yeni plak tespit edilmiştir.".format(newC)
+                messagesX["yeniler"] = {
+                    "message": " {: .0f} new plaque(s) detected.".format(newC), "type": "light"}
              #   flash(" {: .0f} yeni plak tespit edilmiştir.".format(newC), "light")
 
     else:
-        message = "uyumsuz boyut"
-        flash("uyumsuz boyut", "danger")
+        #message = "mismatched size was detected."
+        messagesX["yokOlan"] = {
+            "message": "mismatched size was detected.", "type": "danger"}
+        #flash("uyumsuz boyut", "danger")
         zN = zO = 0
 
-    return message, colorsR1, colorsR2, ratesR1, ratesR2, zO, zN
+    return messagesX, colorsR1, colorsR2, ratesR1, ratesR2, zO, zN
 
 
 def colorSetting(colorM, ColorSet):
@@ -275,16 +284,19 @@ def msDetectionCompare():
 
 @app.route('/msFinderCompare', methods=['POST'])
 def msFinderCompare():
+    messages = {}
     if request.method == 'POST':
         # formdan dosya gelip gelmediğini kontrol edelim
         if 'fname' not in request.files:
-            flash('File not selected', 'danger')
+            messages["fileNotSelected"] = {
+                "message": "File not selected", "type": "danger"}
             return redirect('msDetectionCompare')
 
             # kullanıcı dosya seçmemiş ve tarayıcı boş isim göndermiş mi
         f = request.files['fname']
         if f.filename == '':
-            flash('File not selected', 'danger')
+            messages["fileNotSelected"] = {
+                "message": "File not selected", "type": "danger"}
             return redirect('msDetectionCompare')
 
             # gelen dosyayı güvenlik önlemlerinden geçir
@@ -294,7 +306,7 @@ def msFinderCompare():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
             f.save(filepath)
-            #flash('Dosya başarıyla yüklendi.', 'success')
+
             image = cv2.imread(filepath)
             results = model.detect([image], verbose=1)
 
@@ -306,7 +318,6 @@ def msFinderCompare():
             class_names = ['BG', 'msPlaque']
             visualize.save_instances(
                 image, r['rois'], r['masks'], r['class_ids'], class_names,  r['scores'], path=pred_path)
-            #flash("Tespit edilen lezyon adedi: " + str(len(r['class_ids'])), 'light')
 
             fJson = request.files['jsonfname']
             if fJson and uzanti_kontrolJson(fJson.filename):
@@ -336,22 +347,22 @@ def msFinderCompare():
                                            dataset.class_names, path=GTMatchPath,
                                            show_box=False
                                            )
+
+                olcekler1 = {}
                 result = maskCompound(r['masks'])
                 reference = maskCompound(gt_mask)
 
-                dc = metreE.dc(result, reference)
-                jc = metreE.jc(result, reference)
-                iouX = utils.compute_overlaps_masks(result, reference)
-                iou = iouX[0][0]
-                print()
-                voe = 1-iou
+                olcekler1["DC"] = metreE.dc(result, reference)
+                olcekler1["JC"] = metreE.jc(result, reference)
+                olcekler1["IOU"] = utils.compute_overlaps_masks(result, reference)[
+                    0][0]
+                olcekler1["VOE"] = 1 - olcekler1["IOU"]
+                olcekler1["LTPR"] = metricQc.ltpr(result, reference)
+                olcekler1["LFPR"] = metricQc.lfpr(result, reference)
                 vol = np.count_nonzero(result)
                 if not(vol == 0):
-                    asd = metreE.asd(result, reference)
-                    assd = metreE.assd(result, reference)
-                    #flash("DC:{:.2f}, JC:{:.2f}, VOE:{:.2f}, IOU:{:.2f}, ASD:{:.2f}, ASSD:{:.2f} ".format(dc, jc, voe, iou, asd, assd), "light")
-                # else:
-                    #flash("DC:{:.2f}, JC:{:.2f}, VOE:{:.2f}, IOU:{:.2f} ".format(dc, jc, voe, iou), "light")
+                    olcekler1["ASD"] = metreE.asd(result, reference)
+                    olcekler1["ASSD"] = metreE.assd(result, reference)
 
                 title = "MS-DAF - Automatic MS Detection"
                 cap = "Automatic MS Detection"
@@ -359,20 +370,24 @@ def msFinderCompare():
                     '.')[0]+" file are displayed in detail."
                 return render_template('detectionPre.html', title=title, cap=cap, abstract=abstract,
                                        orjFile=filename,   predFileName=predFileName,
-                                       GTOverFileName=GTMatchFile,  GTFileName=GTFileName)
+                                       GTOverFileName=GTMatchFile,  GTFileName=GTFileName,
+                                       olcekler1=olcekler1, olcekMetin=olcekMetin, messages=messages)
 
-            # else:
-                #flash("Ground Truth file not exist or wrong", "danger")
+            else:
+                messages["jsonEx"] = {
+                    "message": "MS lession only automatic founded, Ground Truth file not exist or wrong", "type": "danger"}
 
             title = "MS-DAF - Automatic MS Detection"
             cap = "Automatic MS Detection"
             abstract = "As a result of the investigations; The automatically detected MS plaque(s) of the "+filename.split(
                 '.')[0]+" file are displayed in detail. Since you did not load the Specialist Physician selections, we continued from this section."
-            return render_template('detectionPre.html', title=title, cap=cap, abstract=abstract, orjFile=filename, predFileName=predFileName)
+            return render_template('detectionPre.html', title=title, cap=cap, abstract=abstract,
+                                   orjFile=filename, predFileName=predFileName, messages=messages)
 
         else:
-            #flash('İzin verilmeyen dosya uzantısı', 'danger')
-            return redirect('msDetection')
+            messages["notAllowedFile"] = {
+                "message": "File not allowed type", "type": "danger"}
+            return redirect('msDetectionCompare')
     else:
         abort(401)
 
@@ -392,179 +407,197 @@ def msFollowUpCompare():
 
 @app.route('/msFollowUpCompareShow', methods=['POST'])
 def msFollowUpCompareShow():
+    messages = {}
     if request.method == 'POST':
         # formdan dosya gelip gelmediğini kontrol edelim
         if ('firstMR' and 'secondMR') not in request.files:
-            flash('Dosya seçilmedi', 'danger')
+            messages["fileNotSelected"] = {
+                "message": "File not selected", "type": "danger"}
             return redirect('msFollowUpCompare')
 
         f0 = request.files['firstMR']
         f1 = request.files['secondMR']
         fJson = request.files['jsonfname']
 
-        if f0.filename == '' or f1.filename == '' or fJson.filename == '':
-            flash('Dosya seçilmedi', 'danger')
+        if f0.filename == '' or f1.filename == '':
+            messages["fileNotSelected"] = {
+                "message": "File not selected", "type": "danger"}
             return redirect('msFollowUpCompare')
 
-        if((f0 and uzanti_kontrol(f0.filename)) and (f1 and uzanti_kontrol(f1.filename)) and (fJson and uzanti_kontrolJson(fJson.filename))) != True:
-            flash('Dosya tipinde hata var. ', 'danger')
-            return redirect('msFollowUpCompare')
-        else:
-            filename0 = secure_filename(f0.filename)
-            filename1 = secure_filename(f1.filename)
+        # if((f0 and uzanti_kontrol(f0.filename)) and (f1 and uzanti_kontrol(f1.filename)) and (fJson and uzanti_kontrolJson(fJson.filename))) != True:
+        #     messages["fileTypeError"] = {
+        #        "message": "File type error", "type": "danger"}
+        #    return redirect('msFollowUpCompare')
+        # else:
 
-            filepath0 = os.path.join(app.config['UPLOAD_FOLDER'], filename0)
-            f0.save(filepath0)
-            # flash('ilk MR görüntüsü başarıyla yüklendi.', 'success')
+        filename0 = secure_filename(f0.filename)
+        filename1 = secure_filename(f1.filename)
 
-            filepath1 = os.path.join(app.config['UPLOAD_FOLDER'], filename1)
-            f1.save(filepath1)
-            # flash('ikinci MR görüntüsü başarıyla yüklendi.', 'success')
-            # flash('Dosyalar başarıyla yüklendi.', 'success')
+        filepath0 = os.path.join(app.config['UPLOAD_FOLDER'], filename0)
+        f0.save(filepath0)
+        # flash('ilk MR görüntüsü başarıyla yüklendi.', 'success')
 
-            class_names = ['BG', 'msMask']
+        filepath1 = os.path.join(app.config['UPLOAD_FOLDER'], filename1)
+        f1.save(filepath1)
+        # flash('ikinci MR görüntüsü başarıyla yüklendi.', 'success')
+        # flash('Dosyalar başarıyla yüklendi.', 'success')
 
-            image1 = cv2.imread(filepath1)
-            results1 = model.detect([image1], verbose=1)
-            r1 = results1[0]
-            predFileName1 = "pre_"+filename1.split('.')[0]+".jpg"
-            pred_path1 = UPLOAD_PRED_PATH+"/"+predFileName1
+        class_names = ['BG', 'msMask']
 
-            image0 = cv2.imread(filepath0)
-            results0 = model.detect([image0], verbose=1)
-            r0 = results0[0]
-            predFileName0 = "pre_"+filename0.split('.')[0]+".jpg"
-            pred_path0 = UPLOAD_PRED_PATH+"/"+predFileName0
+        image1 = cv2.imread(filepath1)
+        results1 = model.detect([image1], verbose=1)
+        r1 = results1[0]
+        predFileName1 = "FU_pre_"+filename1.split('.')[0]+".jpg"
+        pred_path1 = UPLOAD_PRED_PATH+"/"+predFileName1
 
-            message, colorsR0, colorsR1, ratesR0, ratesR1, classIDs0, classIDs1 = compareMasks(
-                r0, r1)
+        image0 = cv2.imread(filepath0)
+        results0 = model.detect([image0], verbose=1)
+        r0 = results0[0]
+        predFileName0 = "FU_pre_"+filename0.split('.')[0]+".jpg"
+        pred_path0 = UPLOAD_PRED_PATH+"/"+predFileName0
+
+        messages1, colorsR0, colorsR1, ratesR0, ratesR1, classIDs0, classIDs1 = compareMasks(
+            r0, r1)
+
+        print(ratesR0, ratesR1, classIDs0, classIDs1)
+
+        class_names = ['old', 'smaller', 'bigger', 'same', 'new']
+
+        visualize.save_instances(
+            image0, r0['rois'], r0['masks'], classIDs0, class_names,  ratesR0,
+            path=pred_path0, colors=colorsR0)
+        visualize.save_instances(
+            image1, r1['rois'], r1['masks'], classIDs1, class_names, ratesR1,
+            path=pred_path1, colors=colorsR1)
+        if fJson and uzanti_kontrolJson(fJson.filename):
+
+            jsonFile = str(uuid.uuid4())+".json"
+            filenameJ = secure_filename(jsonFile)
+            filepathJ = os.path.join(
+                app.config['UPLOAD_FOLDER'], filenameJ)
+            fJson.save(filepathJ)
+            dataset = configFile.MsMaskDataset()
+            print("Json:", filepathJ)
+            dataset.sload_msMask(app.config['UPLOAD_FOLDER'], filepathJ)
+            dataset.prepare()
+            info = dataset.image_info[0]
+            sifir = 0
+            bir = 1
+            if(info["id"] != f0.filename):
+                bir = 0
+                sifir = 1
+
+            image0, image_meta0, gt_class_id0, gt_bbox0, gt_mask0 =\
+                modellib.load_image_gt(
+                    dataset, config, sifir, use_mini_mask=False)
+
+            GTFileName0 = "FU_GT_"+filename0.split('.')[0]+".jpg"
+            GTFilePath0 = UPLOAD_PRED_PATH+"/"+GTFileName0
+
+            image1, image_meta1, gt_class_id1, gt_bbox1, gt_mask1 =\
+                modellib.load_image_gt(
+                    dataset, config, bir, use_mini_mask=False)
+
+            GTFileName1 = "FU_GT_"+filename1.split('.')[0]+".jpg"
+            GTFilePath1 = UPLOAD_PRED_PATH+"/"+GTFileName1
+
+            # class_names = ['BG', 'msMask']
+            # flash("Opinion", "light")
+
+            messages2, colorsR0, colorsR1, ratesR0, ratesR1, classIDs0, classIDs1 = compareM(
+                gt_mask0, gt_mask1)
 
             print(ratesR0, ratesR1, classIDs0, classIDs1)
 
             class_names = ['old', 'smaller', 'bigger', 'same', 'new']
 
             visualize.save_instances(
-                image0, r0['rois'], r0['masks'], classIDs0, class_names,  ratesR0,
-                path=pred_path0, colors=colorsR0)
+                image0, gt_bbox0, gt_mask0, classIDs0, class_names, ratesR0,
+                path=GTFilePath0, colors=colorsR0)
             visualize.save_instances(
-                image1, r1['rois'], r1['masks'], classIDs1, class_names, ratesR1,
-                path=pred_path1, colors=colorsR1)
-            if fJson and uzanti_kontrolJson(fJson.filename):
-                jsonFile = str(uuid.uuid4())+".json"
-                filenameJ = secure_filename(jsonFile)
-                filepathJ = os.path.join(
-                    app.config['UPLOAD_FOLDER'], filenameJ)
-                fJson.save(filepathJ)
-                dataset = configFile.MsMaskDataset()
-                print("Json:", filepathJ)
-                dataset.sload_msMask(app.config['UPLOAD_FOLDER'], filepathJ)
-                dataset.prepare()
-                info = dataset.image_info[0]
-                sifir = 0
-                bir = 1
-                if(info["id"] != f0.filename):
-                    bir = 0
-                    sifir = 1
+                image1, gt_bbox1, gt_mask1, classIDs1, class_names, ratesR1,
+                path=GTFilePath1, colors=colorsR1)
 
-                image0, image_meta0, gt_class_id0, gt_bbox0, gt_mask0 =\
-                    modellib.load_image_gt(
-                        dataset, config, sifir, use_mini_mask=False)
+            # first pic compare score
+            GTMatchFile0 = "FU_GT_over_"+filename0.split('.')[0]+".jpg"
+            GTMatchPath0 = UPLOAD_PRED_PATH+"/"+GTMatchFile0
+            visualize.save_differences(image0, gt_bbox0, gt_class_id0, gt_mask0,
+                                       r0['rois'], r0['class_ids'], r0['scores'], r0['masks'],
+                                       dataset.class_names, path=GTMatchPath0,
+                                       show_box=False
+                                       )
 
-                GTFileName0 = "GT_"+filename0.split('.')[0]+".jpg"
-                GTFilePath0 = UPLOAD_PRED_PATH+"/"+GTFileName0
+            olcekler1 = {}
+            result = maskCompound(r0['masks'])
+            reference = maskCompound(gt_mask0)
 
-                image1, image_meta1, gt_class_id1, gt_bbox1, gt_mask1 =\
-                    modellib.load_image_gt(
-                        dataset, config, bir, use_mini_mask=False)
+            olcekler1["DC"] = metreE.dc(result, reference)
+            olcekler1["JC"] = metreE.jc(result, reference)
+            olcekler1["IOU"] = utils.compute_overlaps_masks(result, reference)[
+                0][0]
+            olcekler1["VOE"] = 1 - olcekler1["IOU"]
+            olcekler1["LTPR"] = metricQc.ltpr(result, reference)
+            olcekler1["LFPR"] = metricQc.lfpr(result, reference)
+            olcekler1["AVD"] = metricQc.avd(result, reference)
+            vol = np.count_nonzero(result)
+            if not(vol == 0):
+                olcekler1["ASD"] = metreE.asd(result, reference)
+                olcekler1["ASSD"] = metreE.assd(result, reference)
 
-                GTFileName1 = "GT_"+filename1.split('.')[0]+".jpg"
-                GTFilePath1 = UPLOAD_PRED_PATH+"/"+GTFileName1
+                # SECOND PİC COMPARE SCORE
 
-                # class_names = ['BG', 'msMask']
-                flash("Opinion", "light")
+            GTMatchFile1 = "FU_GT_over_"+filename1.split('.')[0]+".jpg"
+            GTMatchPath1 = UPLOAD_PRED_PATH+"/"+GTMatchFile1
+            visualize.save_differences(image1, gt_bbox1, gt_class_id1, gt_mask1,
+                                       r1['rois'], r1['class_ids'], r1['scores'], r1['masks'],
+                                       dataset.class_names, path=GTMatchPath1,
+                                       show_box=False
+                                       )
 
-                message, colorsR0, colorsR1, ratesR0, ratesR1, classIDs0, classIDs1 = compareM(
-                    gt_mask0, gt_mask1)
+            result = maskCompound(r1['masks'])
+            reference = maskCompound(gt_mask1)
+            olcekler2 = {}
 
-                print(ratesR0, ratesR1, classIDs0, classIDs1)
+            olcekler2["DC"] = metreE.dc(result, reference)
+            olcekler2["JC"] = metreE.jc(result, reference)
+            olcekler2["IOU"] = utils.compute_overlaps_masks(result, reference)[
+                0][0]
+            olcekler2["VOE"] = 1 - olcekler1["IOU"]
+            olcekler2["LTPR"] = metricQc.ltpr(result, reference)
+            olcekler2["LFPR"] = metricQc.lfpr(result, reference)
+            olcekler2["AVD"] = metricQc.avd(result, reference)
+            vol = np.count_nonzero(result)
+            if not(vol == 0):
+                olcekler2["ASD"] = metreE.asd(result, reference)
+                olcekler2["ASSD"] = metreE.assd(result, reference)
 
-                class_names = ['old', 'smaller', 'bigger', 'same', 'new']
-
-                visualize.save_instances(
-                    image0, gt_bbox0, gt_mask0, classIDs0, class_names, ratesR0,
-                    path=GTFilePath0, colors=colorsR0)
-                visualize.save_instances(
-                    image1, gt_bbox1, gt_mask1, classIDs1, class_names, ratesR1,
-                    path=GTFilePath1, colors=colorsR1)
-
-                GTMatchFile0 = "GT_over_"+filename0.split('.')[0]+".jpg"
-                GTMatchPath0 = UPLOAD_PRED_PATH+"/"+GTMatchFile0
-                visualize.save_differences(image0, gt_bbox0, gt_class_id0, gt_mask0,
-                                           r0['rois'], r0['class_ids'], r0['scores'], r0['masks'],
-                                           dataset.class_names, path=GTMatchPath0,
-                                           show_box=False
-                                           )
-                result = maskCompound(r0['masks'])
-                reference = maskCompound(gt_mask0)
-
-                dc = metreE.dc(result, reference)
-                jc = metreE.jc(result, reference)
-                iouX = utils.compute_overlaps_masks(result, reference)
-                iou = iouX[0][0]
-                print()
-                voe = 1-iou
-                vol = np.count_nonzero(result)
-                if not(vol == 0):
-                    asd = metreE.asd(result, reference)
-                    assd = metreE.assd(result, reference)
-
-                    flash("First MRI: DC:{:.2f}, JC:{:.2f}, VOE:{:.2f}, IOU:{:.2f}, ASD:{:.2f}, ASSD:{:.2f} ".format(
-                        dc, jc, voe, iou, asd, assd), "light")
-                else:
-
-                    flash("First MRI: DC:{:.2f}, JC:{:.2f}, VOE:{:.2f}, IOU:{:.2f} ".format(
-                        dc, jc, voe, iou), "light")
-
-                GTMatchFile1 = "GT_over_"+filename1.split('.')[0]+".jpg"
-                GTMatchPath1 = UPLOAD_PRED_PATH+"/"+GTMatchFile1
-                visualize.save_differences(image1, gt_bbox1, gt_class_id1, gt_mask1,
-                                           r1['rois'], r1['class_ids'], r1['scores'], r1['masks'],
-                                           dataset.class_names, path=GTMatchPath1,
-                                           show_box=False
-                                           )
-                result = maskCompound(r1['masks'])
-                reference = maskCompound(gt_mask1)
-
-                dc = metreE.dc(result, reference)
-                jc = metreE.jc(result, reference)
-                iouX = utils.compute_overlaps_masks(result, reference)
-                iou = iouX[0][0]
-                print()
-                voe = 1-iou
-                vol = np.count_nonzero(result)
-                if not(vol == 0):
-                    asd = metreE.asd(result, reference)
-                    assd = metreE.assd(result, reference)
-                    flash("Second MRI: DC:{:.2f}, JC:{:.2f}, VOE:{:.2f}, IOU:{:.2f}, ASD:{:.2f}, ASSD:{:.2f} ".format(
-                        dc, jc, voe, iou, asd, assd), "light")
-                else:
-                    flash("Second MRI: DC:{:.2f}, JC:{:.2f}, VOE:{:.2f}, IOU:{:.2f} ".format(
-                        dc, jc, voe, iou), "light")
-
-            title = "Karşılaştırmalı Otomatik Follow-Up "
-            cap = "Karşılaştırmalı Otomatik Follow-Up"
-            abstract = "Yükelenen dosyaların uzman hekim görüşleri ile belirtilen plak(ları)\
-                        sistemin otomatik tespit ettiği plak(lar) ve bu plakların değişimlerinin otomatik tespiti\
-                        ,  aşağıda detaylı olarak görülmektedir."
+            title = "Comparative MS Follow-Up"
+            cap = "Comparative MS Follow-Up"
+            abstract = "It is a detailed report of the automatic detection of changes in these plaques,\
+                       which are indicated by the expert physician's opinions regarding the plaque(s) \
+                           automatically detected by the system and the loaded files."
 
             return render_template('followupPre.html', title=title, cap=cap, abstract=abstract,
                                    orjFile0=filename0, orjFile1=filename1,
                                    predFileName0=predFileName0, predFileName1=predFileName1,
                                    GTFileName0=GTFileName0, GTFileName1=GTFileName1,
-                                   GTOverFileName0=GTMatchFile0, GTOverFileName1=GTMatchFile1
+                                   GTOverFileName0=GTMatchFile0, GTOverFileName1=GTMatchFile1,
+                                   olcekler1=olcekler1, olcekler2=olcekler2, olcekMetin=olcekMetin,
+                                   messages1=messages1, messages2=messages2, messages=messages
                                    )
+        title = "Comparative MS Follow-Up"
+        cap = "Comparative MS Follow-Up"
+        abstract = "The plate(s) automatically detected by the system of the uploaded files and the automatic\
+                    detection of the changes of these plates are seen in detail below."
+
+        return render_template('followupPre.html', title=title, cap=cap, abstract=abstract,
+                               orjFile0=filename0, orjFile1=filename1,
+                               predFileName0=predFileName0, predFileName1=predFileName1,
+                               messages=messages1
+                               )
+
     else:
-        flash("bir hata oluştu", "danger")
+        flash("An error.", "danger")
         return redirect('msFollowUpCompare')
 
 

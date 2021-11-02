@@ -16,18 +16,35 @@
 </section><!-- #detection -->
 
 <main id="main">
+
+    {% if messages %}
+    <div class="row py-2">
+        <div class="col-md-6 mx-auto px-3 ">
+            <ul class="list-group">
+                {% for key, value in messages.items() %}
+                <li class="list-group-item list-group-item-{{value.type}} mb-1">
+                    {{value.message}}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {%endif%}
     <section id="followup" class="followup">
         <div class="container">
-            <div id="row mx-auto">
-                <div id="col-md-4">
-                    <h4>
-                        <div class="fs-2 mb-3"><i class="bi bi-file-zip"></i>
-                            <a href="{{url_for('static',filename='testSet1.zip')}}">Example Set </a>
-                    </h4>
+            <div class="row mx-auto">
+                <div class="col-md-2">
+                    <i class="bi bi-file-zip"></i>
+                    <a href="{{url_for('static',filename='testSet1.zip')}}">Example Set 1 </a>
+
+                </div>
+                <div class="col-md-2">
+                    <i class="bi bi-file-zip"></i>
+                    <a href="{{url_for('static',filename='testSet2.zip')}}">Example Set 2 </a>
                 </div>
             </div>
-            </div>
-            <div class="row py-4 col-lg-8 mx-auto">
+
+            <div class="row py-4 mx-auto">
                 <form action="{{fx}}" method="post" enctype="multipart/form-data">
                     <div class=" mx-auto">
                         <!-- Upload image input-->
@@ -43,7 +60,7 @@
                         <div class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
                             <input id="uploadJson" type="file"
                                 onchange="showFileName(this,'uploadJson-label','Json File : ');"
-                                class="form-control border-0" name="jsonfname" >
+                                class="form-control border-0" name="jsonfname">
                             <label id="uploadJson-label" for="uploadJson" class="font-weight-light text-muted">
                                 Select a Grount-Trouth File (coco style) </label>
                         </div>
@@ -63,6 +80,7 @@
                 </div>
             </div>
         </div>
+
     </section>
 </main>
 {% endblock %}

@@ -1,0 +1,249 @@
+{% extends 'base.html'%}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content%}
+<section id="detectionHero">
+    <div class="detectionHero-container">
+        <h1>{{cap}} </h1>
+
+    </div>
+</section><!-- #detection -->
+<main id="main" class="container">
+    <section id="followup" class="followup">
+        {% if abstract %}
+        <p class="py-3">Yapılan incelemeler sonucunda; {{abstract}}</p>
+        {%endif%}
+
+        {% with messages= get_flashed_messages(with_categories=true)%}
+        {% if messages%}
+        <div class="row py-2">
+            {% for category,message in messages %}
+            <div class="col-md-4 mx-auto px-3">
+                <p class=" alert alert-{{category}}" role="alert">{{ message }}</p>
+            </div>
+            {% endfor %}
+
+        </div>
+        {% endif %}
+        {% endwith %}
+
+
+        {% if messages %}
+        <div class="row py-2">
+            <div class="col-md-8 mx-auto px-3  ">
+                <ul class="list-group">
+                    {% for key, value in messages.items() %}
+                    <li class="list-group-item list-group-item-{{value.type}} mb-2">
+                        {{value.message}}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {%endif%}
+
+        <div class="row py-2">
+            {% if messages1%}
+            <div class="col-md-6 mx-auto px-3 ">
+                <h3 class="text-center">Automatic detection messages</h3>
+                <ul class="list-group">
+                    {% for key, value in messages1.items() %}
+                    <li class="list-group-item list-group-item-{{value.type}} mb-2 ">
+                        {{value.message}}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {%endif%}
+
+            {% if messages2%}
+            <div class="col-md-6 mx-auto px-3 ">
+                <h3 class="text-center">Expert selection messages</h3>
+                <ul class="list-group">
+                    {% for key, value in messages2.items() %}
+                    <li class="list-group-item list-group-item-{{value.type}} mb-2">
+                        {{value.message}}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {%endif%}
+
+        </div>
+
+
+        <div class="row py-2">
+            {% if olcekler1 %}
+            <div class="col-md-6 mx-auto px-3 ">
+                <h4 class="py-3 text-center">First MRI Detection Scores</h4>
+                <table class="table table-sm w-50 mx-auto table-hover ">
+                    <thead>
+                        <tr>
+                            <th scope="col">Metric</th>
+                            <th scope="col" class="w-25">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, value in olcekler1.items() %}
+                        <tr data-toggle="tooltip" data-placement="bottom" title="{{olcekMetin[key]}}">
+                            <th scope="row">{{key}}</th>
+                            <td>%{{"%2.2f"|format(value*100)}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {%endif%}
+
+            {% if olcekler2 %}
+            <div class="col-md-6 mx-auto px-3">
+                <h4 class="py-3 text-center">Second MRI Detection Scores</h4>
+                <table class="table table-sm w-50 mx-auto table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Metric</th>
+                            <th scope="col" class="w-25">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, value in olcekler2.items() %}
+                        <tr>
+                            <th scope="row">{{key}}</th>
+                            <td class="justify-content-end">%{{"%2.2f"|format(value*100)}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {%endif%}
+        </div>
+
+
+
+        <div class="row py-2">
+            <div class="btn-toolbar m-2 justify-content-center" role="toolbar">
+                <div class="btn-group btn-group-sm m-2" role="group" aria-label="Orjinal MRI Show / Hide">
+                    <button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
+                        onclick="showHide('predFile'); showHide('GTOverFile');showHide('GTFile');showHide('orjFile');">
+                        Show / Hide All</button>
+                    {%if predFileName%} <button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
+                        onclick="showHide('predFile');">
+                        Show / Hide Prediction MRI</button> {%endif%}
+                    {%if GTOverFileName%} <button type="button" class="btn btn-outline-success  mx-3 p-2 rounded"
+                        onclick="showHide('GTOverFile');">
+                        Show / Hide GT- Prediction Overlaps MRI</button>{%endif%}
+                    {%if GTFileName%}<button type="button" class="btn btn-outline-success  mx-3 p-2 rounded"
+                        onclick="showHide('GTFile');">
+                        Show / Hide GT MRI</button>{%endif%}
+                    {%if orjFile%}<button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
+                        onclick="showHide('orjFile');">
+                        Show / Hide Orjinal MRI</button>{%endif%}
+                </div>
+            </div>
+        </div>
+
+        <div class="row py-2" id="preDetecAll">
+            {%if predFileName0%}
+
+            <div class="col-md-6 mt-3" id="predFile0">
+                <p class="font-italic  text-center">
+                    Otomatik Tespit Edilen MS Plaklarının Görünümü
+                </p>
+                <div class="image-area border-secondary"><img id="imageResult"
+                        src="{{url_for('detecFile',filename=predFileName0)}}" alt=""
+                        class="img-fluid rounded shadow-sm mx-auto d-block">
+                </div>
+            </div>
+            {%endif%}
+
+            {%if predFileName1%}
+            <div class="col-md-6 mt-3 " id="predFile1">
+                <p class="font-italic  text-center">
+                    Otomatik Tespit Edilen MS Plaklarının Görünümü
+                </p>
+                <div class="image-area border-secondary"><img id="imageResult"
+                        src="{{url_for('detecFile',filename=predFileName1)}}" alt=""
+                        class="img-fluid rounded shadow-sm mx-auto d-block">
+                </div>
+            </div>
+            {%endif%}
+            {%if GTOverFileName0%}
+
+            <div class="col-md-6 mt-3 " id="GTOverFile0">
+                <p class="font-italic  text-center">
+                    Otomatik Tespit Edilen Plaklar ile Uzman Hekim Görüşünün Örtüşme Görüntüsü
+                </p>
+                <div class="image-area border-secondary"><img id="imageResult"
+                        src="{{url_for('detecFile',filename=GTOverFileName0)}}" alt=""
+                        class="img-fluid rounded shadow-sm mx-auto d-block">
+                </div>
+            </div>
+            {%endif%}
+            {%if GTOverFileName1%}
+
+            <div class="col-md-6 mt-3 " id="GTOverFile1">
+                <p class="font-italic  text-center">
+                    Otomatik Tespit Edilen Plaklar ile Uzman Hekim Görüşünün Örtüşme Görüntüsü
+                </p>
+                <div class="image-area border-secondary"><img id="imageResult"
+                        src="{{url_for('detecFile',filename=GTOverFileName1)}}" alt=""
+                        class="img-fluid rounded shadow-sm mx-auto d-block">
+                </div>
+            </div>
+            {%endif%}
+            {%if GTFileName0%}
+
+            <div class="col-md-6 mt-3 " id="GTFile0">
+                <p class="font-italic  text-center">
+                    Uzman hekimin belirlediği plak alanları
+                </p>
+                <div class="image-area border-secondary"><img id="imageResult"
+                        src="{{url_for('detecFile',filename=GTFileName0)}}" alt=""
+                        class="img-fluid rounded shadow-sm mx-auto d-block">
+                </div>
+            </div>
+            {%endif%}
+            {%if GTFileName1%}
+
+            <div class="col-md-6 mt-3 " id="GTFile1">
+                <p class="font-italic  text-center">
+                    Uzman hekimin belirlediği plak alanları
+                </p>
+                <div class="image-area border-secondary"><img id="imageResult"
+                        src="{{url_for('detecFile',filename=GTFileName1)}}" alt=""
+                        class="img-fluid rounded shadow-sm mx-auto d-block">
+                </div>
+            </div>
+            {%endif%}
+            {%if orjFile0%}
+            <div class="col-md-6 mt-3 " id="orjFile0">
+                <p class="font-italic  text-center">
+                    Orjinal MR kesiti
+                </p>
+                <div class="image-area border-secondary"><img id=" imageResult"
+                        src="{{url_for('detecFile',filename=orjFile0)}}" alt=""
+                        class="img-fluid rounded shadow-sm mx-auto d-block">
+                </div>
+            </div>
+            {%endif%}
+            {%if orjFile1%}
+            <div class="col-md-6 mt-3 " id="orjFile1">
+                <p class="font-italic  text-center">
+                    Orjinal MR kesiti
+                </p>
+                <div class="image-area border-secondary"><img id=" imageResult"
+                        src="{{url_for('detecFile',filename=orjFile1)}}" alt=""
+                        class="img-fluid rounded shadow-sm mx-auto d-block">
+                </div>
+            </div>
+            {%endif%}
+
+
+        </div>
+
+    </section>
+</main>
+{% endblock %}

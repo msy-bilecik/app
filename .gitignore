@@ -1,4 +1,2 @@
-
 *.h5
-/static/uploadFolder
-*pycache*
+$GIT_DIR/static/uploadFolder/*

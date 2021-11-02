@@ -6,10 +6,7 @@ def compareM(masks1, masks2):
         message = ""
         ix = masks1.shape[2]
         iy = masks2.shape[2]
-        zN = np.zeros(iy).astype(int)+4
-        zO = np.zeros(ix).astype(int)
-        ratesR1 = np.zeros(ix)
-        ratesR2 = np.zeros(iy)
+
         bMatrix = np.zeros((ix, iy))
         i = 0
         r1 = []
@@ -41,34 +38,45 @@ def colorSetting(colorM, ColorSet):
     return colors
 
 
-def compareMessage(bMatrix):
+def compareMessage(bMatrix, treshold):
     ix = bMatrix.shape[1]
     iy = bMatrix.shape[2]
     zN = np.zeros(iy).astype(int)+4
     zO = np.zeros(ix).astype(int)
+
+    ratesR1 = np.zeros(ix)
+    ratesR2 = np.zeros(iy)
+
     zNew = bMatrix.sum(axis=0)
     zOld = bMatrix.sum(axis=1)
-
     exC = zOld.size-np.count_nonzero(zOld)
     newC = zNew.size-np.count_nonzero(zNew)
+    altesik = 1-treshold
+    ustesik = 1+treshold
 
+    message = {"message": "", "type": ""}
+
+    messages = {}
     for i in range(ix):
         for t in range(iy):
-            if (sScore > 0.98 and sScore < 1.02):
+            sScore = bMatrix[i, t]
+            if (sScore > altesik and sScore < ustesik):
                 likeC = likeC+1
                 zN[t] = 3
                 zO[i] = 3
                 ratesR1[i] = 0
                 ratesR2[t] = 0
-            elif (sScore <= 0.98):
+            elif (sScore <= altesik):
                 tinyC = tinyC+1
                 zN[t] = 1
                 zO[i] = 1
                 rate = (1 - sScore)*100
                 ratesR1[i] = rate
                 ratesR2[t] = rate
-                # flash(" 1 plak  %{:.2f} küçülmüştür. ".format(rate), "success")
-            elif (sScore >= 1.02):
+                message = {
+                    "message": " 1 plak  %{:.2f} küçülmüştür. ".format(rate), "type": "success"}
+                messages = messages+{"kuculen"+tinyC: message}
+            elif (sScore >= ustesik):
                 bigC = bigC+1
                 zN[t] = 2
                 zO[i] = 2
@@ -84,35 +92,41 @@ def compareMessage(bMatrix):
         if (zNew[i] == 0):
             ratesR2[i] = 0
 
-        if(likeC == 0 and bigC == 0 and tinyC == 0):
-            message = "değerlendirme için yeterli benzerlik bulunamadı. "
-           # flash("değerlendirme için yeterli benzerlik bulunamadı. ", "info")
-        elif(likeC == iy and likeC == ix):
-            message = "lezyonlarda değişim olmamıştır."
-           # flash("lezyonlarda değişim olmamıştır.", "success")
-        else:
-            if(likeC > 0):
-                message = message + \
-                    "{:.0f} plakda değişim olmamıştır.".format(likeC)
-            #    flash("{:.0f} plakda değişim olmamıştır.".format(likeC), "info")
-            if(tinyC > 0):
-                message = message + " {:.0f} plak küçülmüştür.".format(tinyC)
-            if(bigC > 0):
-                message = message + \
-                    " {:.0f} plakda büyüme gözlenmiştir.".format(bigC)
-            if(exC > 0):
-                message = message + \
-                    " {: .0f} plak gözlenmemiştir.".format(exC)
-             #   flash(" {: .0f} plak gözlenmemiştir.".format(exC), "warning")
-            if(newC > 0):
-                message = message + \
-                    " {: .0f} yeni plak tespit edilmiştir.".format(newC)
-             #   flash(" {: .0f} yeni plak tespit edilmiştir.".format(newC), "light")
-
+    if(likeC == 0 and bigC == 0 and tinyC == 0):
+        message = {
+            "message": "değerlendirme için yeterli benzerlik bulunamadı. ", "type": "info"}
+        messages = messages+{"benzemiyor": message}
+       # flash("değerlendirme için yeterli benzerlik bulunamadı. ", "info")
+    elif(likeC == iy and likeC == ix):
+        message = "lezyonlarda değişim olmamıştır."
+        message = {
+            "message": "lezyonlarda değişim olmamıştır. ", "type": "success"}
+        messages = {"hicDegismemis": message}
+       # flash("lezyonlarda değişim olmamıştır.", "success")
     else:
-        message = "uyumsuz boyut"
-        flash("uyumsuz boyut", "danger")
-        zN = zO = 0
+        if(likeC > 0):
+            message = {
+                "message": "{} plakda değişim olmamıştır.".format(likeC), "type": "info"}
+            messages = messages+{"toplamBenzer": message}
+        #    flash("{} plakda değişim olmamıştır.".format(likeC), "info")
+        if(tinyC > 0):
+            message = {
+                "message": " {} plak küçülmüştür.".format(tinyC), "type": "info"}
+            messages = messages+{"toplamKücülen": message}
+        if(bigC > 0):
+            message = {
+                "message": " {} plakda büyüme gözlenmiştir.".format(bigC), "type": "info"}
+            messages = messages+{"toplamBüyüyen": message}
+        if(exC > 0):
+            message = {
+                "message": " {: .0f} plak gözlenmemiştir.".format(exC), "type": "warning"}
+            messages = messages+{"toplamYokolan": message}
+        if(newC > 0):
+
+            message = {
+                "message":  " {: .0f} yeni plak tespit edilmiştir.".format(newC), "type": "light"}
+            messages = messages+{"toplamYeni": message}
 
     colorsR2 = colorSetting(zN, ColorSet)
     colorsR1 = colorSetting(zO, ColorSet)
+    return
