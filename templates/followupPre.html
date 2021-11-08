@@ -91,7 +91,7 @@
                         {% for key, value in olcekler1.items() %}
                         <tr data-toggle="tooltip" data-placement="bottom" title="{% if olcekMetin[key] %} {{olcekMetin[key]}} {%endif%}">
                             <th scope="row">{{key}}</th>
-                            <td>{{"%2.2f"|format(value*100)}} </td>
+                            <td>%{{"%2.2f"|format(value*100)}} </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -113,7 +113,7 @@
                         {% for key, value in olcekler2.items() %}
                         <tr>
                             <th scope="row">{{key}}</th>
-                            <td>{{"%2.2f"|format(value*100)}}</td>
+                            <td>%{{"%2.2f"|format(value*100)}}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

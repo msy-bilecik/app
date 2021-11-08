@@ -47,7 +47,7 @@
                         {% for key, value in olcekler1.items() %}
                         <tr data-toggle="tooltip" data-placement="bottom" title="{{olcekMetin[key]}}">
                             <th scope="row">{{key}}</th>
-                            <td>{{"%2.2f"|format(value*100)}}</td>
+                            <td>%{{"%2.2f"|format(value*100)}}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

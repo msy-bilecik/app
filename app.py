@@ -7,7 +7,7 @@ from mrcnn import utils
 import configFile
 from py import metricQc
 from py import metreE
-from flask import Flask, redirect, url_for, request, render_template, Response, jsonify, redirect, flash, abort
+from flask import Flask, url_for, request, render_template, Response, jsonify, redirect, flash, abort
 from werkzeug.utils import secure_filename
 from gevent.pywsgi import WSGIServer
 import numpy as np
@@ -261,10 +261,10 @@ def colorSetting(colorM, ColorSet):
 
 @app.route('/')
 def index():
-    title = "MS-DAF"
+    t= "DeepMSWeb"
     cap = "Homepage - Test"
     content = "Multiple Sclerosis Detection And Follow-up System Test Page"
-    return render_template('main.html', title=title, cap=cap, content=content)
+    return render_template('main.html', title=t, cap=cap, content=content)
 
 
 @app.route('/showPic/<filename>')
@@ -274,7 +274,7 @@ def detecFile(filename):
 
 @app.route('/msDetectionCompare')
 def msDetectionCompare():
-    title = "MS-DAF - Automatic MS Detection"
+    title = "DeepMSWeb - Automatic MS Detection"
     cap = "Automatic MS Detection"
     abstract = "This application page that automatically detects MS plaques in MR images and compares them with physician vision. For this, you must load the segmentation information of the MR images in VGG 1.0.6 format. "
     fxUrl = url_for("msFinderCompare")
@@ -353,18 +353,18 @@ def msFinderCompare():
                 reference = maskCompound(gt_mask)
 
                 olcekler1["DC"] = metreE.dc(result, reference)
-                olcekler1["JC"] = metreE.jc(result, reference)
-                olcekler1["IOU"] = utils.compute_overlaps_masks(result, reference)[
-                    0][0]
-                olcekler1["VOE"] = 1 - olcekler1["IOU"]
+                #olcekler1["JC"] = metreE.jc(result, reference)
+                #olcekler1["IOU"] = utils.compute_overlaps_masks(result, reference)[0][0]
+                iou = utils.compute_overlaps_masks(result, reference)[0][0]
+                olcekler1["VOE"] = 1 - iou
                 olcekler1["LTPR"] = metricQc.ltpr(result, reference)
                 olcekler1["LFPR"] = metricQc.lfpr(result, reference)
-                vol = np.count_nonzero(result)
-                if not(vol == 0):
-                    olcekler1["ASD"] = metreE.asd(result, reference)
-                    olcekler1["ASSD"] = metreE.assd(result, reference)
+                # vol = np.count_nonzero(result)
+                # if not(vol == 0):
+                #     olcekler1["ASD"] = metreE.asd(result, reference)
+                #     olcekler1["ASSD"] = metreE.assd(result, reference)
 
-                title = "MS-DAF - Automatic MS Detection"
+                title = "DeepMSWeb - Automatic MS Detection"
                 cap = "Automatic MS Detection"
                 abstract = "As a result of the investigations; The automatically detected MS plaque(s) of the "+filename.split(
                     '.')[0]+" file are displayed in detail."
@@ -377,7 +377,7 @@ def msFinderCompare():
                 messages["jsonEx"] = {
                     "message": "MS lession only automatic founded, Ground Truth file not exist or wrong", "type": "danger"}
 
-            title = "MS-DAF - Automatic MS Detection"
+            title = "DeepMSWeb - Automatic MS Detection"
             cap = "Automatic MS Detection"
             abstract = "As a result of the investigations; The automatically detected MS plaque(s) of the "+filename.split(
                 '.')[0]+" file are displayed in detail. Since you did not load the Specialist Physician selections, we continued from this section."
@@ -397,7 +397,7 @@ def msFinderCompare():
 
 @app.route('/msFollowUpCompare')
 def msFollowUpCompare():
-    title = "MS-DAF - MS FollowUp "
+    title = "DeepMSWeb - MS FollowUp "
     cap = "Comparative MS Follow-Up"
     abstract = "It is our application page that displays the MS plaques marked by the physicians and compares the images taken in two different periods. For this, you must upload your segmentation file in MR section and VGG 1.0.6 format."
     fxUrl = url_for("msFollowUpCompareShow")
@@ -532,17 +532,17 @@ def msFollowUpCompareShow():
             reference = maskCompound(gt_mask0)
 
             olcekler1["DC"] = metreE.dc(result, reference)
-            olcekler1["JC"] = metreE.jc(result, reference)
-            olcekler1["IOU"] = utils.compute_overlaps_masks(result, reference)[
-                0][0]
-            olcekler1["VOE"] = 1 - olcekler1["IOU"]
+            # olcekler1["JC"] = metreE.jc(result, reference)
+            # olcekler1["IOU"] = utils.compute_overlaps_masks(result, reference)[0][0]
+            iou = utils.compute_overlaps_masks(result, reference)[0][0]
+            olcekler1["VOE"] = 1 - iou
             olcekler1["LTPR"] = metricQc.ltpr(result, reference)
             olcekler1["LFPR"] = metricQc.lfpr(result, reference)
-            olcekler1["AVD"] = metricQc.avd(result, reference)
-            vol = np.count_nonzero(result)
-            if not(vol == 0):
-                olcekler1["ASD"] = metreE.asd(result, reference)
-                olcekler1["ASSD"] = metreE.assd(result, reference)
+            # olcekler1["AVD"] = metricQc.avd(result, reference)
+            # vol = np.count_nonzero(result)
+            # if not(vol == 0):
+            #     olcekler1["ASD"] = metreE.asd(result, reference)
+            #     olcekler1["ASSD"] = metreE.assd(result, reference)
 
                 # SECOND PİC COMPARE SCORE
 
@@ -559,17 +559,17 @@ def msFollowUpCompareShow():
             olcekler2 = {}
 
             olcekler2["DC"] = metreE.dc(result, reference)
-            olcekler2["JC"] = metreE.jc(result, reference)
-            olcekler2["IOU"] = utils.compute_overlaps_masks(result, reference)[
-                0][0]
-            olcekler2["VOE"] = 1 - olcekler1["IOU"]
+            # olcekler2["JC"] = metreE.jc(result, reference)
+            # olcekler2["IOU"] = utils.compute_overlaps_masks(result, reference)[0][0]
+            iou = utils.compute_overlaps_masks(result, reference)[0][0]
+            olcekler2["VOE"] = 1 - iou
             olcekler2["LTPR"] = metricQc.ltpr(result, reference)
             olcekler2["LFPR"] = metricQc.lfpr(result, reference)
-            olcekler2["AVD"] = metricQc.avd(result, reference)
-            vol = np.count_nonzero(result)
-            if not(vol == 0):
-                olcekler2["ASD"] = metreE.asd(result, reference)
-                olcekler2["ASSD"] = metreE.assd(result, reference)
+            # olcekler2["AVD"] = metricQc.avd(result, reference)
+            # vol = np.count_nonzero(result)
+            # if not(vol == 0):
+            #     olcekler2["ASD"] = metreE.asd(result, reference)
+            #     olcekler2["ASSD"] = metreE.assd(result, reference)
 
             title = "Comparative MS Follow-Up"
             cap = "Comparative MS Follow-Up"
