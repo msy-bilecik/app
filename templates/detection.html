@@ -9,7 +9,7 @@
 <section id="detectionHero">
     <div class="detectionHero-container">
         <h1>{{cap}}</h1>
-        {% if abstract %}
+        {% if abstract1 %}
         <h2>{{abstract}}</h2>
         {%endif%}
     </div>
@@ -33,12 +33,12 @@
     <section id="followup" class="followup">
         <div class="container">
             <div class="row mx-auto">
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <i class="bi bi-file-zip"></i>
                     <a href="{{url_for('static',filename='testSet1.zip')}}">Example Set 1 </a>
 
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <i class="bi bi-file-zip"></i>
                     <a href="{{url_for('static',filename='testSet2.zip')}}">Example Set 2 </a>
                 </div>
@@ -52,8 +52,7 @@
                             <input id="upload0" type="file"
                                 onchange="showFileName(this,'upload0-label','MRI File : ');readURL(this);"
                                 class="form-control-lg border-0 bg-dark" name="fname" required>
-                            <label id="upload0-label" for="upload0" class="font-weight-light text-muted">Select a MR
-                                Slice</label>
+                            <label id="upload0-label" for="upload0" class="font-weight-light text-muted">Choose a MR Slice</label>
                         </div>
 
                         {%if json1%}
@@ -68,13 +67,13 @@
 
                         <div class="input-group mb-3 px-5 py-2 mx-auto rounded-pill bg-success shadow-sm">
                             <input type="submit" class="btn btn-success rounded-pill px-4 w-100 justify-content-center"
-                                value="Upload">
+                                value="Detect MS Lesions">
                         </div>
 
                     </div>
                 </form>
                 <!-- Uploaded image area-->
-                <p class="font-italic text-black-50 text-center mt-2">MR Slice</p>
+                <p class="font-italic text-black-50 text-center mt-2">The uploaded MR slice</p>
                 <div class="image-area col-lg-8 mx-auto"><img id="imageResult" src="#" alt=""
                         class="img-fluid rounded shadow-sm mx-auto d-block">
                 </div>

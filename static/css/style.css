@@ -1072,7 +1072,7 @@ section {
   right: 0;
   display: flex;
   padding-top: 80px;
-  justify-content: center;
+  justify-content: end;
   align-items: center;
   flex-direction: column;
   text-align: center;

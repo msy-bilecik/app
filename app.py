@@ -366,7 +366,7 @@ def msFinderCompare():
 
                 title = "DeepMSWeb - Automatic MS Detection"
                 cap = "Automatic MS Detection"
-                abstract = "As a result of the investigations; The automatically detected MS plaque(s) of the "+filename.split(
+                abstract = "As a result of the investigations; the automatically detected MS plaque(s) of the "+filename.split(
                     '.')[0]+" file are displayed in detail."
                 return render_template('detectionPre.html', title=title, cap=cap, abstract=abstract,
                                        orjFile=filename,   predFileName=predFileName,
