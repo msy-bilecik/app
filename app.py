@@ -4,9 +4,10 @@
 import mrcnn.model as modellib
 from mrcnn import visualize
 from mrcnn import utils
-import configFile
 from py import metricQc
 from py import metreE
+#from py import deepmswebFx
+import configFile
 from flask import Flask, url_for, request, render_template, Response, jsonify, redirect, flash, abort
 from werkzeug.utils import secure_filename
 from gevent.pywsgi import WSGIServer
@@ -78,11 +79,7 @@ ColorSet = [(1.0, 1.0, 0.0), (0.5, 1.0, 0.0),  (1.0, 0.0, 0.0),
             (0.0, 0.5, 1.0), (1, 1, 1)]
 olcekMetin = {}
 olcekMetin["DC"] = "DC is a criterion calculated according to the overlap amount of the region placed on the pre-selected regions"
-olcekMetin["JC"] = "JC Similarity"
-olcekMetin["IOU"] = "IOU Similarity"
 olcekMetin["VOE"] = "The VOE metric shows the error rate between the expert opinion and the masked region"
-olcekMetin["ASD"] = "ASD Similarity"
-olcekMetin["ASSD"] = "ASSD Similarity"
 olcekMetin["LTPR"] = "LTPR"
 olcekMetin["LFPR"] = "LFPR"
 # (1.0, 1.0, 0.0) sarı
@@ -167,7 +164,8 @@ def compareM(masks1, masks2):
                         ratesR1[i] = rate
                         ratesR2[t] = rate
                         messagesX["kuculmus"+str(tinyC)] = {
-                            "message": "1 plaque is %{: .2f} smaller than before. ".format(rate), "type": "success"}
+                            "message": "1 plak  %{:.2f} küçülmüştür.  ".format(rate), "type": "success"}
+                        #"message": "1 plaque is %{: .2f} smaller than before. ".format(rate), "type": "success"}
                         # flash(" 1 plak  %{:.2f} küçülmüştür. ".format(rate), "success")
                     elif (bMatrix[i, t] >= 1.02):
                         bigC = bigC+1
@@ -177,7 +175,8 @@ def compareM(masks1, masks2):
                         ratesR1[i] = rate
                         ratesR2[t] = rate
                         messagesX["buyumus"+str(bigC)] = {
-                            "message": " 1 plaque is %{:.2f} larger than before.".format(rate), "type": "danger"}
+                            "message": " 1 plakda %{:.2f} büyüme gözlenmiştir.".format(rate), "type": "danger"}
+                        #"message": " 1 plaque is %{:.2f} larger than before.".format(rate), "type": "danger"}
                         # flash(" 1 plakda %{:.2f} büyüme gözlenmiştir. ".format(rate), "danger")
 
                 cMatrix[i, t] = simScore
@@ -210,41 +209,46 @@ def compareM(masks1, masks2):
 
         if(likeC == 0 and bigC == 0 and tinyC == 0):
             messagesX["notEvulate"] = {
-                "message": "Not enough similarity found for evaluation.", "type": "info"}
+                "message": "Değerlendirme için yeterli benzerlik bulunamadı.", "type": "info"}
+            #"message": "Not enough similarity found for evaluation.", "type": "info"}
            # flash("değerlendirme için yeterli benzerlik bulunamadı. ", "info")
         elif(likeC == iy and likeC == ix):
             messagesX["degismemis"] = {
-                "message": "There is no change in the plaque(s).", "type": "success"}
+                "message": "Lezyonlarda değişim olmamıştır.", "type": "success"}
+           # "message": "There is no change in the plaque(s).", "type": "success"}
            # flash("lezyonlarda değişim olmamıştır.", "success")
         else:
             if(likeC > 0):
                 messagesX["benzerSayisi"] = {
-                    "message": "There was no change in {:.0f} plaque(s).".format(likeC), "type": "info"}
+                    "message": "{:.0f} plakda değişim olmamıştır.".format(likeC), "type": "info"}
+               # "message": "There was no change in {:.0f} plaque(s).".format(likeC), "type": "info"}
             #    flash("{:.0f} plakda değişim olmamıştır.".format(likeC), "info")
             if(tinyC > 0):
                 #message = " {:.0f} plak küçülmüştür.".format(tinyC)
                 messagesX["kuculensayisi"] = {
-                    "message": " {:.0f} plaque(s) smaller than before.".format(tinyC), "type": "success"}
+                    "message": " {:.0f} plak küçülmüştür.".format(tinyC), "type": "success"}
+               # "message": " {:.0f} plaque(s) smaller than before.".format(tinyC), "type": "success"}
             if(bigC > 0):
               #  message = message +  " {:.0f} plakda büyüme gözlenmiştir.".format(bigC)
                 messagesX["buyuyenSayisi"] = {
-                    "message": " {:.0f} plaque(s) bigger than before.".format(bigC), "type": "danger"}
+                    "message": " {:.0f} plakda büyüme gözlenmiştir.".format(bigC), "type": "danger"}
+                #"message": " {:.0f} plaque(s) bigger than before.".format(bigC), "type": "danger"}
 
             if(exC > 0):
-               # message = message + \  " {: .0f} plak gözlenmemiştir.".format(exC)
+               # "message": " {: .0f} plaque(s) not observed".format(exC), "type": "warning"}
                 messagesX["yokOlan"] = {
-                    "message": " {: .0f} plaque(s) not observed".format(exC), "type": "warning"}
+                    "message": " {: .0f} plak gözlenmemiştir.".format(exC), "type": "warning"}
              #   flash(" {: .0f} plak gözlenmemiştir.".format(exC), "warning")
             if(newC > 0):
                # message = message + \                    " {: .0f} yeni plak tespit edilmiştir.".format(newC)
                 messagesX["yeniler"] = {
-                    "message": " {: .0f} new plaque(s) detected.".format(newC), "type": "light"}
+                    "message": " {: .0f} yeni plak(lar) tespit edildi.".format(newC), "type": "light"}
              #   flash(" {: .0f} yeni plak tespit edilmiştir.".format(newC), "light")
 
     else:
         #message = "mismatched size was detected."
         messagesX["yokOlan"] = {
-            "message": "mismatched size was detected.", "type": "danger"}
+            "message": "uyumsuz boyut tespit edildi.", "type": "danger"}
         #flash("uyumsuz boyut", "danger")
         zN = zO = 0
 
@@ -261,7 +265,7 @@ def colorSetting(colorM, ColorSet):
 
 @app.route('/')
 def index():
-    t= "DeepMSWeb"
+    t = "DeepMSWeb"
     cap = "Homepage - Test"
     content = "Multiple Sclerosis Detection And Follow-up System Test Page"
     return render_template('main.html', title=t, cap=cap, content=content)
@@ -274,12 +278,14 @@ def detecFile(filename):
 
 @app.route('/msDetectionCompare')
 def msDetectionCompare():
-    title = "DeepMSWeb - Automatic MS Detection"
-    cap = "Automatic MS Detection"
-    abstract = "This application page that automatically detects MS plaques in MR images and compares them with physician vision. For this, you must load the segmentation information of the MR images in VGG 1.0.6 format. "
+    title = "DeepMSWeb - Otomatik MS Tespiti"
+    cap = "Otomatik MS Tespiti"
+    abstract = "MR görüntülerindeki MS plaklarını otomatik olarak algılayan ve bunları uzman hekim görüşü\
+         ile karşılaştıran bu uygulama sayfası. Bunun için MR görüntülerinin bölütleme bilgilerini\
+              VGG 1.0.6 formatında yüklemelisiniz. "
     fxUrl = url_for("msFinderCompare")
     json = True
-    return render_template('detection.html', title=title, cap=cap, abstract=abstract, fx=fxUrl, json1=json)
+    return render_template('detection.html', title=title, cap=cap, abstract1=abstract, fx=fxUrl, json1=json)
 
 
 @app.route('/msFinderCompare', methods=['POST'])
@@ -289,14 +295,14 @@ def msFinderCompare():
         # formdan dosya gelip gelmediğini kontrol edelim
         if 'fname' not in request.files:
             messages["fileNotSelected"] = {
-                "message": "File not selected", "type": "danger"}
+                "message": "Dosya seçilmemiştir", "type": "danger"}
             return redirect('msDetectionCompare')
 
             # kullanıcı dosya seçmemiş ve tarayıcı boş isim göndermiş mi
         f = request.files['fname']
         if f.filename == '':
             messages["fileNotSelected"] = {
-                "message": "File not selected", "type": "danger"}
+                "message": "Dosya seçilmemiştir", "type": "danger"}
             return redirect('msDetectionCompare')
 
             # gelen dosyayı güvenlik önlemlerinden geçir
@@ -364,10 +370,10 @@ def msFinderCompare():
                 #     olcekler1["ASD"] = metreE.asd(result, reference)
                 #     olcekler1["ASSD"] = metreE.assd(result, reference)
 
-                title = "DeepMSWeb - Automatic MS Detection"
-                cap = "Automatic MS Detection"
-                abstract = "As a result of the investigations; the automatically detected MS plaque(s) of the "+filename.split(
-                    '.')[0]+" file are displayed in detail."
+                title = "DeepMSWeb - Otomatik MS Tespiti"
+                cap = "Otomatik MS Tespiti"
+                abstract = filename.split('.')[0]+" dosyasında incelemeler sonucunda; otomatik olarak\
+                             algılanan MS plak(lar)ının tüm detayları görülmektedir."
                 return render_template('detectionPre.html', title=title, cap=cap, abstract=abstract,
                                        orjFile=filename,   predFileName=predFileName,
                                        GTOverFileName=GTMatchFile,  GTFileName=GTFileName,
@@ -375,18 +381,19 @@ def msFinderCompare():
 
             else:
                 messages["jsonEx"] = {
-                    "message": "MS lession only automatic founded, Ground Truth file not exist or wrong", "type": "danger"}
+                    "message": "MS lezyonları sadece otomatik olarak tespit edilmiştir. \
+                         Uzman görüşü dosyası yüklenmedi yada hatalı.", "type": "danger"}
 
-            title = "DeepMSWeb - Automatic MS Detection"
-            cap = "Automatic MS Detection"
-            abstract = "As a result of the investigations; The automatically detected MS plaque(s) of the "+filename.split(
-                '.')[0]+" file are displayed in detail. Since you did not load the Specialist Physician selections, we continued from this section."
+            title = "DeepMSWeb - Otomatik MS Tespiti"
+            cap = "Otomatik MS Tespiti"
+            abstract = "İncelemeler sonucunda;" + filename.split('.')[0]+" dosyasının otomatik olarak algılanan \
+                        MS plakaları ve ayrıntıları görüntülenmektedir."
             return render_template('detectionPre.html', title=title, cap=cap, abstract=abstract,
                                    orjFile=filename, predFileName=predFileName, messages=messages)
 
         else:
             messages["notAllowedFile"] = {
-                "message": "File not allowed type", "type": "danger"}
+                "message": "Dosya izin verilen türde değil", "type": "danger"}
             return redirect('msDetectionCompare')
     else:
         abort(401)
@@ -397,12 +404,14 @@ def msFinderCompare():
 
 @app.route('/msFollowUpCompare')
 def msFollowUpCompare():
-    title = "DeepMSWeb - MS FollowUp "
-    cap = "Comparative MS Follow-Up"
-    abstract = "It is our application page that displays the MS plaques marked by the physicians and compares the images taken in two different periods. For this, you must upload your segmentation file in MR section and VGG 1.0.6 format."
+    title = "DeepMSWeb - Otomatik Değişim Tespiti"
+    cap = "Karşılaştırmalı Otomatik Değişim Tespiti"
+    abstract = "Hekimler tarafından işaretlenen MS plaklarının görüntülendiği ve \
+         iki farklı dönemde çekilen görüntülerin karşılaştırıldığı uygulama sayfamızdır. \
+             Bunun için segmentasyon dosyanızı MR bölümünde ve VGG 1.0.6 formatında yüklemelisiniz."
     fxUrl = url_for("msFollowUpCompareShow")
     json = True
-    return render_template('followup.html',  title=title, cap=cap, abstract=abstract, fx=fxUrl, json1=json)
+    return render_template('followup.html',  title=title, cap=cap, abstract1=abstract, fx=fxUrl, json1=json)
 
 
 @app.route('/msFollowUpCompareShow', methods=['POST'])
@@ -412,7 +421,7 @@ def msFollowUpCompareShow():
         # formdan dosya gelip gelmediğini kontrol edelim
         if ('firstMR' and 'secondMR') not in request.files:
             messages["fileNotSelected"] = {
-                "message": "File not selected", "type": "danger"}
+                "message": "Dosya seçilmemiştir", "type": "danger"}
             return redirect('msFollowUpCompare')
 
         f0 = request.files['firstMR']
@@ -421,7 +430,7 @@ def msFollowUpCompareShow():
 
         if f0.filename == '' or f1.filename == '':
             messages["fileNotSelected"] = {
-                "message": "File not selected", "type": "danger"}
+                "message": "Dosya seçilmemiştir", "type": "danger"}
             return redirect('msFollowUpCompare')
 
         # if((f0 and uzanti_kontrol(f0.filename)) and (f1 and uzanti_kontrol(f1.filename)) and (fJson and uzanti_kontrolJson(fJson.filename))) != True:
@@ -544,7 +553,7 @@ def msFollowUpCompareShow():
             #     olcekler1["ASD"] = metreE.asd(result, reference)
             #     olcekler1["ASSD"] = metreE.assd(result, reference)
 
-                # SECOND PİC COMPARE SCORE
+            # SECOND PİC COMPARE SCORE
 
             GTMatchFile1 = "FU_GT_over_"+filename1.split('.')[0]+".jpg"
             GTMatchPath1 = UPLOAD_PRED_PATH+"/"+GTMatchFile1
@@ -571,11 +580,11 @@ def msFollowUpCompareShow():
             #     olcekler2["ASD"] = metreE.asd(result, reference)
             #     olcekler2["ASSD"] = metreE.assd(result, reference)
 
-            title = "Comparative MS Follow-Up"
-            cap = "Comparative MS Follow-Up"
-            abstract = "It is a detailed report of the automatic detection of changes in these plaques,\
-                       which are indicated by the expert physician's opinions regarding the plaque(s) \
-                           automatically detected by the system and the loaded files."
+            title = "Karşılaştırmalı Otomatik Değişim Tespiti"
+            cap = "Karşılaştırmalı Otomatik Değişim Tespiti"
+            abstract = "Yükelenen dosyaların uzman hekim görüşleri ile belirtilen plak(ları)\
+                        sistemin otomatik tespit ettiği plak(lar) ve bu plakların değişimlerinin otomatik tespiti\
+                        ,  aşağıda detaylı olarak görülmektedir."
 
             return render_template('followupPre.html', title=title, cap=cap, abstract=abstract,
                                    orjFile0=filename0, orjFile1=filename1,
@@ -585,10 +594,10 @@ def msFollowUpCompareShow():
                                    olcekler1=olcekler1, olcekler2=olcekler2, olcekMetin=olcekMetin,
                                    messages1=messages1, messages2=messages2, messages=messages
                                    )
-        title = "Comparative MS Follow-Up"
-        cap = "Comparative MS Follow-Up"
-        abstract = "The plate(s) automatically detected by the system of the uploaded files and the automatic\
-                    detection of the changes of these plates are seen in detail below."
+        title = "Karşılaştırmalı Otomatik Değişim Tespiti"
+        cap = "Karşılaştırmalı Otomatik Değişim Tespiti"
+        abstract = "Yüklenen dosyaların sistem tarafından otomatik olarak algılanan plak(lar)ı \
+            ve bu plaklardaki değişikliklerin otomatik tespiti aşağıda detaylı olarak görülmektedir."
 
         return render_template('followupPre.html', title=title, cap=cap, abstract=abstract,
                                orjFile0=filename0, orjFile1=filename1,
@@ -597,7 +606,7 @@ def msFollowUpCompareShow():
                                )
 
     else:
-        flash("An error.", "danger")
+        flash("Bir Hata", "danger")
         return redirect('msFollowUpCompare')
 
 

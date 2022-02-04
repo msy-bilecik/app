@@ -15,7 +15,7 @@
 <main id="main" class="container">
     <section id="followup" class="followup">
         {% if abstract %}
-        <p class="py-3">Yapılan incelemeler sonucunda; {{abstract}}</p>
+        <p class="py-3">{{abstract}}</p>
         {%endif%}
 
         {% with messagesX= get_flashed_messages(with_categories=true)%}
@@ -35,12 +35,12 @@
         <div class="row py-2">
             {% if olcekler1 %}
             <div class="col-md-6 mx-auto px-3 ">
-                <h4 class="py-3 text-center">Değerlendirme ölçütlerine göre tespit başarımı skorları</h4>
+                <h4 class="py-3 text-center">Detection scores using evaluation metrics</h4>
                 <table class="table table-sm mx-auto table-hover ">
                     <thead>
                         <tr>
-                            <th scope="col">Ölçüt</th>
-                            <th scope="col" class="w-25">Skor</th>
+                            <th scope="col">Metric</th>
+                            <th scope="col" class="w-25">Score</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,22 +71,22 @@
 
         <div class="row py-2">
             <div class="btn-toolbar m-2 justify-content-center" role="toolbar">
-                <div class="btn-group btn-group-sm m-2" role="group" aria-label="Orjinal MRI Göster / Gizle">
+                <div class="btn-group btn-group-sm m-2" role="group" aria-label="Orjinal MRI Show / Hide">
                     <button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
                         onclick="showHide('predFile'); showHide('GTOverFile');showHide('GTFile');showHide('orjFile');">
-                        Tümünü Göster / Gizle </button>
+                        Show / Hide All</button>
                     {%if predFileName%} <button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
                         onclick="showHide('predFile');">
-                        Segmentasyon MRI Sonucunu Göster / Gizle</button> {%endif%}
+                        Show / Hide Prediction MRI</button> {%endif%}
                     {%if GTOverFileName%} <button type="button" class="btn btn-outline-success  mx-3 p-2 rounded"
                         onclick="showHide('GTOverFile');">
-                        GT - Segmentasyon MRI Örtüşmesi Göster / Gizle </button>{%endif%}
+                        Show / Hide GT- Prediction Overlaps MRI</button>{%endif%}
                     {%if GTFileName%}<button type="button" class="btn btn-outline-success  mx-3 p-2 rounded"
                         onclick="showHide('GTFile');">
-                        GT MRI Göster / Gizle </button>{%endif%}
+                        Show / Hide GT MRI</button>{%endif%}
                     {%if orjFile%}<button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
                         onclick="showHide('orjFile');">
-                        Orjinal MRI Göster / Gizle </button>{%endif%}
+                        Show / Hide Orjinal MRI</button>{%endif%}
                 </div>
             </div>
         </div>
@@ -96,13 +96,13 @@
 
             <div class="card  p-2 m-2 col-md-5 " id="predFile">
                 <a href="{{url_for('detecFile',filename=predFileName)}}" class="glightbox2"
-                    data-glightbox='Bottom; description:DeepMSWeb ile MRI Üzerinde Otomatik Tespit Edilen MS Plakları ' id="predFile">
+                    data-glightbox='Bottom; description:Automatically Detected Plaques on MRI' id="predFile">
                     <img id="imageResult" src="{{url_for('detecFile',filename=predFileName)}}" alt=""
                         class="img-fluid rounded shadow-sm mx-auto d-block">
                 </a>
                 <div class="card-body">
                     <h6 class="card-title text-center">
-                        DeepMSWeb ile MRI Üzerinde Otomatik Tespit Edilen MS Plakları 
+                        Automatically Detected Plaques on MRI using DeepMSWeb
                     </h6>
                 </div>
 
@@ -112,14 +112,14 @@
             {%if GTOverFileName%}
             <div class="card  p-2 m-2 col-md-5" id="GTOverFile">
                 <a href="{{url_for('detecFile',filename=GTOverFileName)}}" class="glightbox2"
-                    data-glightbox='Bottom; description:MRI Üzerinde Otomatik Tespit Edilen MS Plakları ve Uzman Seçimlerinin Örtüşmesi'
+                    data-glightbox='Bottom; description:Overlap of Automatically Detected and Specialist Physician Selection Plaques'
                     id="predFile">
                     <img id="imageResult" src="{{url_for('detecFile',filename=GTOverFileName)}}" alt=""
                         class="img-fluid rounded shadow-sm mx-auto d-block">
                 </a>
                 <div class="card-body">
                     <h6 class="card-title text-center">
-                        MRI Üzerinde Otomatik Tespit Edilen MS Plakları ve Uzman Seçimlerinin Örtüşmesi
+                        Overlap of Automatically Detected using DeepMSWeb and Physician Selection Plaques
                     </h6>
                 </div>
 
@@ -130,13 +130,13 @@
             {%if GTFileName%}
             <div class="card  p-2 m-2 col-md-5" id="GTFile">
                 <a href="{{url_for('detecFile',filename=GTFileName)}}" class="glightbox2"
-                    data-glightbox='Bottom; description:Uzman Görüşlerini İçeren MRI Kesiti (GT)' id="predFile">
+                    data-glightbox='Bottom; description:Physician Selection Plaques' id="predFile">
                     <img id="imageResult" src="{{url_for('detecFile',filename=GTFileName)}}" alt=""
                         class="img-fluid rounded shadow-sm mx-auto d-block">
                 </a>
                 <div class="card-body">
                     <h6 class="card-title text-center">
-                        Uzman Görüşlerini İçeren MRI Kesiti (GT)
+                        Physician Selection Plaques (Ground Truth)
                     </h6>
                 </div>
 
@@ -152,7 +152,7 @@
                 </a>
                 <div class="card-body">
                     <h6 class="card-title text-center">
-                        Original MRI Kesiti
+                        Original MRI Slice
                     </h6>
                 </div>
 

@@ -48,7 +48,7 @@
         <div class="row py-2">
             {% if messages1%}
             <div class="col-md-6 mx-auto px-3 ">
-                <h3 class="text-center">DeepMSWeb'e Göre Değişim Bilgileri</h3>
+                <h3 class="text-center">Automatic detection messages</h3>
                 <ul class="list-group">
                     {% for key, value in messages1.items() %}
                     <li class="list-group-item list-group-item-{{value.type}} mb-2 ">
@@ -61,7 +61,7 @@
 
             {% if messages2 %}
             <div class="col-md-6 mx-auto px-3 ">
-                <h3 class="text-center">Uzman Görüşlerine Göre Değişim Bilgileri</h3>
+                <h3 class="text-center">Expert selection messages</h3>
                 <ul class="list-group">
                     {% for key, value in messages2.items() %}
                     <li class="list-group-item list-group-item-{{value.type}} mb-2">
@@ -79,18 +79,17 @@
             <!--"%2.2f"|format(value*100)-->
             {% if olcekler1 %}
             <div class="col-md-6 mx-auto px-3 ">
-                <h4 class="py-3 text-center">İlk MRI Tespit Skorları</h4>
+                <h4 class="py-3 text-center">First MRI Detection Scores</h4>
                 <table class="table table-sm w-50 mx-auto table-hover ">
                     <thead>
                         <tr>
-                            <th scope="col">Ölçüt</th>
-                            <th scope="col" class="w-25">Skor</th>
+                            <th scope="col">Metric</th>
+                            <th scope="col" class="w-25">Score</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for key, value in olcekler1.items() %}
-                        <tr data-toggle="tooltip" data-placement="bottom"
-                            title="{% if olcekMetin[key] %} {{olcekMetin[key]}} {%endif%}">
+                        <tr data-toggle="tooltip" data-placement="bottom" title="{% if olcekMetin[key] %} {{olcekMetin[key]}} {%endif%}">
                             <th scope="row">{{key}}</th>
                             <td>%{{"%2.2f"|format(value*100)}} </td>
                         </tr>
@@ -102,12 +101,12 @@
 
             {% if olcekler2 %}
             <div class="col-md-6 mx-auto px-3">
-                <h4 class="py-3 text-center">İkinci MRI Tespit Skorları</h4>
+                <h4 class="py-3 text-center">Second MRI Detection Scores</h4>
                 <table class="table table-sm w-50 mx-auto table-hover">
                     <thead>
                         <tr>
-                            <th scope="col">Ölçüt</th>
-                            <th scope="col" class="w-25">Skor</th>
+                            <th scope="col">Metric</th>
+                            <th scope="col" class="w-25">Score</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -130,19 +129,19 @@
                 <div class="btn-group btn-group-sm m-2" role="group" aria-label="Orjinal MRI Show / Hide">
                     <button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
                         onclick="showHide('preDetecAll'); showHide('GTOverFileAll');showHide('GTFileAll');showHide('orjFileAll');">
-                        Tümünü Göster / Gizle </button>
+                        Show / Hide All</button>
                     {%if predFileName0%} <button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
                         onclick="showHide('preDetecAll');">
-                        Segmentasyon MRI Sonucunu Göster / Gizle</button> {%endif%}
+                        Show / Hide Prediction MRI</button> {%endif%}
                     {%if GTOverFileName0%} <button type="button" class="btn btn-outline-success  mx-3 p-2 rounded"
                         onclick="showHide('GTOverFileAll');">
-                        GT - Segmentasyon MRI Örtüşmesi Göster / Gizle </button>{%endif%}
+                        Show / Hide GT- Prediction Overlaps MRI</button>{%endif%}
                     {%if GTFileName0%}<button type="button" class="btn btn-outline-success  mx-3 p-2 rounded"
                         onclick="showHide('GTFileAll');">
-                        GT MRI Göster / Gizle</button>{%endif%}
+                        Show / Hide GT MRI</button>{%endif%}
                     {%if orjFile0%}<button type="button" class="btn btn-outline-success mx-3 p-2 rounded"
                         onclick="showHide('orjFileAll');">
-                        Orjinal MRI Göster / Gizle</button>{%endif%}
+                        Show / Hide Orjinal MRI</button>{%endif%}
                 </div>
             </div>
         </div>
@@ -152,28 +151,26 @@
         <div class="card-group" id="preDetecAll">
             <div class="card p-2 m-2 " id="predFile0">
                 <a href="{{url_for('detecFile',filename=predFileName0)}}" class="glightbox2"
-                    data-glightbox='Bottom; description:DeepMSWeb ile İlk MRI Üzerinde Otomatik Tespit Edilen MS Plakları'
-                    id="predFile0">
+                    data-glightbox='Bottom; description:Automatically Detected Plaques in First MRI' id="predFile0">
                     <img id="predFile0_img" src="{{url_for('detecFile',filename=predFileName0)}}" alt=""
                         class=" card-img-top img-fluid rounded shadow-sm mx-auto d-block ">
                 </a>
                 <div class="card-body">
                     <h6 class="card-title text-center">
-                        DeepMSWeb ile İlk MRI Üzerinde Otomatik Tespit Edilen MS Plakları
+                        Automatically Detected Plaques in First MRI
                     </h6>
                 </div>
             </div>
 
             <div class="card p-2 m-2 " id="predFile1">
                 <a href="{{url_for('detecFile',filename=predFileName1)}}" class="glightbox2"
-                    data-glightbox='Bottom; description:DeepMSWeb ile İkinci MRI Üzerinde Otomatik Tespit Edilen MS Plakları'
-                    id="predFile1">
+                    data-glightbox='Bottom; description:Automatically Detected Plaques in Second MRI' id="predFile1">
                     <img id="predFile1_img" src="{{url_for('detecFile',filename=predFileName1)}}" alt=""
                         class="card-img-top  img-fluid rounded shadow-sm mx-auto d-block">
                 </a>
                 <div class="card-body">
                     <h6 class="card-title  text-center">
-                        DeepMSWeb ile İkinci MRI Üzerinde Otomatik Tespit Edilen MS Plakları
+                        Automatically Detected Plaques in Second MRI
                     </h6>
                 </div>
             </div>
@@ -184,15 +181,14 @@
         <div class="card-group " id="GTOverFileAll">
             <div class="card p-2 m-2 " id="GTOverFile0">
                 <a href="{{url_for('detecFile',filename=GTOverFileName0)}}" class="glightbox2"
-                    data-glightbox='Bottom; description:DeepMSWeb ile İlk MRI Üzerinde Otomatik Tespit Edilen MS Plakları ve Uzman Seçimlerinin Örtüşmesi'
+                    data-glightbox='Bottom; description:Overlap of Automatically Detected and Specialist Physician Selection Plaques in First MRI'
                     id="GTOverFile0">
                     <img id="GTOverFile0_img" src="{{url_for('detecFile',filename=GTOverFileName0)}}" alt=""
                         class="card-img-top img-fluid rounded shadow-sm mx-auto d-block">
                 </a>
                 <div class="card-body">
                     <h6 class="card-title text-center">
-                        DeepMSWeb ile İlk MRI Üzerinde Otomatik Tespit Edilen MS Plakları ve Uzman Seçimlerinin
-                        Örtüşmesi
+                        Overlap of Automatically Detected and Specialist Physician Selection Plaques in First MRI
                     </h6>
                 </div>
             </div>
@@ -207,8 +203,7 @@
                 </a>
                 <div class="card-body">
                     <h6 class="card-title text-center">
-                        DeepMSWeb ile İkinci MRI Üzerinde Otomatik Tespit Edilen MS Plakları ve Uzman Seçimlerinin
-                        Örtüşmesi
+                        Overlap of Automatically Detected and Specialist Physician Selection Plaques in Second MRI
                     </h6>
                 </div>
             </div>
@@ -219,13 +214,13 @@
         <div class="card-group" id="GTFileAll">
             <div class="card p-2 m-2 " id="GTFile0">
                 <a href="{{url_for('detecFile',filename=GTFileName0)}}" class="glightbox2"
-                    data-glightbox='Bottom; description:Uzman Görüşlerini İçeren İlk MRI Kesiti (GT)' id="GTFileName0">
+                    data-glightbox='Bottom; description:Physician Selection Plaques in First MRI' id="GTFileName0">
                     <img id="GTFile0_img" src="{{url_for('detecFile',filename=GTFileName0)}}" alt=""
                         class="card-img-top  img-fluid rounded shadow-sm mx-auto d-block">
                 </a>
                 <div class="card-body">
                     <p class="card-title text-center">
-                        Uzman Görüşlerini İçeren İlk MRI Kesiti (GT)
+                        Physician Selection Plaques in First MRI
                     </p>
                 </div>
             </div>
@@ -233,14 +228,13 @@
 
             <div class="card p-2 m-2 " id="GTFile1">
                 <a href="{{url_for('detecFile',filename=GTFileName1)}}" class="glightbox2"
-                    data-glightbox='Bottom; description:Uzman Görüşlerini İçeren İkinci MRI Kesiti (GT)'
-                    id="GTFileName1">
+                    data-glightbox='Bottom; description:Physician Selection Plaques in Second MRI' id="GTFileName1">
                     <img id="GTFile1_img" src="{{url_for('detecFile',filename=GTFileName1)}}" alt=""
                         class="card-img-top img-fluid rounded shadow-sm mx-auto d-block">
                 </a>
                 <div class="card-body">
                     <p class="card-title text-center">
-                        Uzman Görüşlerini İçeren İkinci MRI Kesiti (GT)
+                        Physician Selection Plaques in Second MRI
                     </p>
                 </div>
             </div>
@@ -251,26 +245,26 @@
         <div class="card-group" id="orjFileAll">
             <div class="card p-2 m-2 " id="orjFile0">
                 <a href="{{url_for('detecFile',filename=orjFile0)}}" class="glightbox2"
-                    data-glightbox='Bottom; description:Original İlk MRI Kesiti' id="orjFile0">
+                    data-glightbox='Bottom; description:The First Original MRI Slice' id="orjFile0">
                     <img id="orjFile0_img" src="{{url_for('detecFile',filename=orjFile0)}}" alt=""
                         class="card-img-top  img-fluid rounded shadow-sm mx-auto d-block">
                 </a>
                 <div class="card-body">
                     <p class="card-title text-center">
-                        Original İlk MRI Kesiti
+                        The First Original MRI Slice
                     </p>
                 </div>
             </div>
 
             <div class="card p-2 m-2 " id="orjFile1">
                 <a href="{{url_for('detecFile',filename=orjFile1)}}" class="glightbox2"
-                    data-glightbox='Bottom; description:Original İkinci MRI Kesiti' id="orjFile1">
+                    data-glightbox='Bottom; description:The Second Original MRI Slice' id="orjFile1">
                     <img id="orjFile1_img" src="{{url_for('detecFile',filename=orjFile1)}}" alt=""
                         class="card-img-top  img-fluid rounded shadow-sm mx-auto d-block">
                 </a>
                 <div class="card-body">
                     <p class="card-title text-center">
-                        Original İkinci MRI Kesiti
+                        The Second Original MRI Slice
                     </p>
                 </div>
             </div>
